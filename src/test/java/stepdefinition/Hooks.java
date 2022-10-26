@@ -1,6 +1,7 @@
 package stepdefinition;
 
 
+import common.action.GlobalConfiguration;
 import io.cucumber.java.After;
 import io.cucumber.java.Before;
 import org.junit.Assert;
@@ -19,37 +20,42 @@ public class Hooks {
     @Before
     public void launchBrowser() {
 
-        String URL = null;
-        String browser = null;
-        Properties prop = readEnvironmentFile();
-        if (prop == null) {
-            Assert.fail("No environment is provided in command line or if provided it's not matching with any properties file at \\src\\test\\resources\\environments location");
-        } else {
-            URL = prop.getProperty("URL");
-            browser = prop.getProperty("BROWSER");
-            prop.clear();
-        }
-        System.out.println("Executing Hooks");
-        if (driver == null) {
-            if (browser.equalsIgnoreCase("chrome")) {
-                System.setProperty("webdriver.chrome.driver", System.getProperty("user.dir") + "\\src\\test\\resources\\drivers\\chromedriver\\chromedriver.exe");
-                driver = new ChromeDriver();
-                driver.manage().window().maximize();
-                driver.get(URL);
-            } else if (browser.equalsIgnoreCase("Firefox")) {
-
-            } else if (browser.equalsIgnoreCase("Edge")) {
-
-            } else if (browser.equalsIgnoreCase("random")) {
-
+        try {
+            String URL = null;
+            String browser = null;
+            GlobalConfiguration globalObject = new GlobalConfiguration();
+            Properties prop = readEnvironmentFile();
+            if (prop == null) {
+                Assert.fail("No environment is provided in command line or if provided it's not matching with any properties file at \\src\\test\\resources\\environments location");
+            } else {
+                URL = prop.getProperty("URL");
+                browser = prop.getProperty("BROWSER");
+                prop.clear();
             }
+            System.out.println("Executing Hooks");
+            if (driver == null) {
+                if (browser.equalsIgnoreCase("chrome")) {
+                    System.setProperty("webdriver.chrome.driver", System.getProperty("user.dir") + "\\src\\test\\resources\\drivers\\chromedriver\\chromedriver.exe");
+                    driver = new ChromeDriver();
+                    driver.manage().window().maximize();
+                    driver.get(URL);
+                } else if (browser.equalsIgnoreCase("Firefox")) {
+
+                } else if (browser.equalsIgnoreCase("Edge")) {
+
+                } else if (browser.equalsIgnoreCase("random")) {
+
+                }
+            }
+        } catch (Exception e) {
+            System.out.println("Exception occurred while launching browser : " + e);
         }
 
     }
 
     @After
     public void closeBrowser() {
-        driver.quit();
+        //driver.quit();
     }
 
     public Properties readEnvironmentFile() {

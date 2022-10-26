@@ -2,6 +2,7 @@ package stepdefinition;
 
 import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
+import io.cucumber.java.en.When;
 import org.openqa.selenium.WebDriver;
 import page.objects.HomePage;
 import page.objects.LoginPage;
@@ -10,7 +11,7 @@ public class LoginValidationStep {
 
     WebDriver driver = Hooks.driver;
 
-    @Given("enter the user name as {string} and password as {string}")
+    @When("enter the user name as {string} and password as {string}")
     public void enter_the_user_name_as_and_password_as(String userName, String passWord) {
         LoginPage loginValidationObject = new LoginPage(driver);
         loginValidationObject.setUserName(userName);

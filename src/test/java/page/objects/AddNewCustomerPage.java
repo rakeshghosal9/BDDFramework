@@ -1,5 +1,7 @@
 package page.objects;
 
+import common.action.ReusableCommonMethods;
+import org.junit.Assert;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
@@ -52,5 +54,35 @@ public class AddNewCustomerPage {
 
     @FindBy(xpath = "//input[@name='res']")
     WebElement reset;
+
+    public void addNewCustomer(String customerNameTxt, String genderTxt, String dobTxt, String addressTxt, String cityTxt,
+                               String stateTxt, String pinTxt, String mobileTxt, String emailTxt, String passwordTxt) {
+        try {
+            ReusableCommonMethods.enterValueInTextBox(customerName, customerNameTxt, driver);
+            if (genderTxt.equalsIgnoreCase("male")) {
+                ReusableCommonMethods.clickOnWebElement(driver, gender_male);
+            } else {
+                ReusableCommonMethods.clickOnWebElement(driver, gender_female);
+            }
+            ReusableCommonMethods.enterValueInTextBox(dateOfBirth, dobTxt, driver);
+            ReusableCommonMethods.enterValueInTextBox(address, addressTxt, driver);
+            ReusableCommonMethods.enterValueInTextBox(city, cityTxt, driver);
+            ReusableCommonMethods.enterValueInTextBox(state, stateTxt, driver);
+            ReusableCommonMethods.enterValueInTextBox(pin, pinTxt, driver);
+            ReusableCommonMethods.enterValueInTextBox(phoneNumber, mobileTxt, driver);
+            ReusableCommonMethods.enterValueInTextBox(email, emailTxt, driver);
+            ReusableCommonMethods.enterValueInTextBox(password, passwordTxt, driver);
+
+        } catch (Exception e) {
+            Assert.fail("Exception occurred while adding new customer");
+
+        }
+
+    }
+
+    public void clickOnSubmitButton(WebDriver driver) {
+        Assert.assertTrue("Submit button is clicked successfully on New Customer Page : ",
+                ReusableCommonMethods.clickOnWebElement(driver, submit));
+    }
 
 }
