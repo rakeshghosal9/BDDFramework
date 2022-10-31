@@ -60,7 +60,8 @@ public class Hooks {
 
     public Properties readEnvironmentFile() {
         try {
-            String environment = System.getProperty("env");
+            //String environment = System.getProperty("env");
+            String environment = "INTG1";
             if (environment != null) {
                 FileInputStream fis = null;
                 Properties prop = null;

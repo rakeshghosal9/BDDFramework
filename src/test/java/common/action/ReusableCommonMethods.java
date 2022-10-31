@@ -1,16 +1,15 @@
 package common.action;
 
-import org.openqa.selenium.NoSuchElementException;
-import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.WebElement;
-import org.openqa.selenium.support.ui.ExpectedConditions;
-import org.openqa.selenium.support.ui.FluentWait;
-import org.openqa.selenium.support.ui.Wait;
+import org.openqa.selenium.*;
+import org.openqa.selenium.interactions.Actions;
+import org.openqa.selenium.support.ui.*;
+import page.objects.AddNewCustomerPage;
 
 import javax.xml.bind.Element;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.sql.Time;
 import java.time.Duration;
 import java.util.Properties;
 
@@ -89,6 +88,19 @@ public class ReusableCommonMethods {
             return true;
         } catch (Exception e) {
             System.out.println("Exception occurred while clicking on web element [" + element + "]");
+            return false;
+        }
+    }
+
+    public static boolean selectDropdownValue(WebDriver driver,WebElement element, String dropdownValue) {
+        try {
+            Wait<WebDriver> fluentWait = getFluentWaitObject(driver);
+            fluentWait.until(ExpectedConditions.elementToBeClickable(element));
+            Select dropdown = new Select(element);
+            dropdown.selectByValue(dropdownValue);
+            return true;
+        } catch (Exception e) {
+            System.out.println("Exception occurred while selecting dropdown value [" + dropdownValue + "] " + e);
             return false;
         }
     }

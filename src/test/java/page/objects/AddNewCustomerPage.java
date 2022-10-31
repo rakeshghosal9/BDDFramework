@@ -2,10 +2,15 @@ package page.objects;
 
 import common.action.ReusableCommonMethods;
 import org.junit.Assert;
-import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.WebElement;
+import org.openqa.selenium.*;
+import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.support.FindBy;
 import org.openqa.selenium.support.PageFactory;
+import org.openqa.selenium.support.ui.ExpectedConditions;
+import org.openqa.selenium.support.ui.WebDriverWait;
+
+import java.time.Duration;
+import java.util.List;
 
 public class AddNewCustomerPage {
 
@@ -55,6 +60,13 @@ public class AddNewCustomerPage {
     @FindBy(xpath = "//input[@name='res']")
     WebElement reset;
 
+    @FindBy(xpath = "//div[@id='dismiss-button']")
+    WebElement addDismissButton;
+
+    @FindBy(xpath = "//iframe[@id='ad_iframe']")
+    WebElement advertisementIFrame;
+
+
     public void addNewCustomer(String customerNameTxt, String genderTxt, String dobTxt, String addressTxt, String cityTxt,
                                String stateTxt, String pinTxt, String mobileTxt, String emailTxt, String passwordTxt) {
         try {
@@ -64,7 +76,8 @@ public class AddNewCustomerPage {
             } else {
                 ReusableCommonMethods.clickOnWebElement(driver, gender_female);
             }
-            ReusableCommonMethods.enterValueInTextBox(dateOfBirth, dobTxt, driver);
+            //ReusableCommonMethods.enterValueInTextBox(dateOfBirth, dobTxt, driver);
+            enterDOB(driver);
             ReusableCommonMethods.enterValueInTextBox(address, addressTxt, driver);
             ReusableCommonMethods.enterValueInTextBox(city, cityTxt, driver);
             ReusableCommonMethods.enterValueInTextBox(state, stateTxt, driver);
@@ -84,5 +97,69 @@ public class AddNewCustomerPage {
         Assert.assertTrue("Submit button is clicked successfully on New Customer Page : ",
                 ReusableCommonMethods.clickOnWebElement(driver, submit));
     }
+
+    public void enterDOB(WebDriver driver) {
+        try {
+            dateOfBirth.click();
+            Actions act = new Actions(driver);
+            act.keyDown(Keys.NUMPAD1).keyUp(Keys.NUMPAD1).build().perform();
+        } catch (Exception e) {
+            System.out.println("Exception : " + e);
+
+        }
+    }
+
+    public void handleAdDismissButton(WebDriver driver) {
+
+        try {
+            List<WebElement> allFrame = driver.findElements(By.xpath("//iframe"));
+            for(int i=0;i<allFrame.size();i++)
+            {
+                System.out.println(allFrame.get(i).getAttribute("id"));
+            }
+
+        }catch (Exception e)
+        {
+            System.out.println(e);
+        }
+
+        /*try {
+            if (ReusableCommonMethods.waitForAnElementWhileWaitingForOtherElementToBeDisplayed(advertisementIFrame,
+                    customerName, driver, 30)) {
+                System.out.println("Add Pop up button is displayed, clicking on close");
+                driver.switchTo().frame("ad_iframe");
+                ReusableCommonMethods.clickOnWebElement(driver, addDismissButton);
+                driver.switchTo().defaultContent();
+            }
+        } catch (Exception e) {
+            System.out.println("Exception : " + e);
+        }*/
+    }
+
+    public static boolean waitForAnElementWhileWaitingForOtherElementToBeDisplayed(WebElement elementToWait, WebElement
+            elementToWaitToBeDisplayed,
+                                                                                   WebDriver driver, int time) {
+        int count = 0;
+        while (count <= time) {
+            try {
+                System.out.println("Waiting for element : "+elementToWait);
+                new WebDriverWait(driver, Duration.ofSeconds(1)).until(ExpectedConditions.visibilityOf(elementToWait));
+                return true;
+            } catch (TimeoutException TE) {
+                try {
+                    System.out.println("Waiting for second element : "+elementToWaitToBeDisplayed);
+                    new WebDriverWait(driver, Duration.ofSeconds(1)).until(ExpectedConditions.
+                            visibilityOf(elementToWaitToBeDisplayed));
+                    return false;
+
+                } catch (TimeoutException TET) {
+                    count++;
+                }
+
+            }
+        }
+        return false;
+    }
+
 
 }

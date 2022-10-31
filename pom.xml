@@ -75,7 +75,7 @@
                     <!--<sourceRunnerTemplateFile>src/test/resources/cucable.template</sourceRunnerTemplateFile>-->
 
                     <!-- process all features in the given directory -->
-                    <sourceFeatures>src/test/resources/features/guru99_Login</sourceFeatures>
+                    <sourceFeatures>src/test/resources/features/automation_practice</sourceFeatures>
 
                     <!-- process a specific feature file in the given directory -->
                     <!--<sourceFeatures>src/test/resources/features/testfeature/MyTest9.feature</sourceFeatures>-->
