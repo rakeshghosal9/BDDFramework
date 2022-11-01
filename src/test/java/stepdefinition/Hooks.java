@@ -7,6 +7,8 @@ import io.cucumber.java.Before;
 import org.junit.Assert;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.chrome.ChromeDriver;
+import org.openqa.selenium.firefox.FirefoxDriver;
+import org.openqa.selenium.firefox.FirefoxOptions;
 
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -35,12 +37,20 @@ public class Hooks {
             System.out.println("Executing Hooks");
             if (driver == null) {
                 if (browser.equalsIgnoreCase("chrome")) {
-                    System.setProperty("webdriver.chrome.driver", System.getProperty("user.dir") + "\\src\\test\\resources\\drivers\\chromedriver\\chromedriver.exe");
+                    System.setProperty("webdriver.chrome.driver", System.getProperty("user.dir") +
+                            "\\src\\test\\resources\\drivers\\chromedriver\\chromedriver.exe");
                     driver = new ChromeDriver();
                     driver.manage().window().maximize();
                     driver.get(URL);
                 } else if (browser.equalsIgnoreCase("Firefox")) {
-
+                    System.setProperty("webdriver.gecko.driver", System.getProperty("user.dir") +
+                            "\\src\\test\\resources\\drivers\\firefoxdriver\\geckodriver.exe");
+                    FirefoxOptions options = new FirefoxOptions();
+                    String strFFBinaryPath = "C:\\Program Files (x86)\\Mozilla Firefox\\firefox.exe";
+                    options.setBinary(strFFBinaryPath);
+                    driver = new FirefoxDriver(options);
+                    driver.manage().window().maximize();
+                    driver.get(URL);
                 } else if (browser.equalsIgnoreCase("Edge")) {
 
                 } else if (browser.equalsIgnoreCase("random")) {
@@ -55,7 +65,7 @@ public class Hooks {
 
     @After
     public void closeBrowser() {
-        //driver.quit();
+        driver.quit();
     }
 
     public Properties readEnvironmentFile() {

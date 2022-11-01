@@ -52,10 +52,13 @@ public class CreateAnAccountPage_Demo {
     @FindBy(xpath = "//input[@id='address1']")
     WebElement address1;
 
-    @FindBy(xpath = "//input[@id='city']")
+    @FindBy(xpath = "//input[@id='address2']")
     WebElement address2;
 
-    @FindBy(xpath = "//input[@id='id_state']")
+    @FindBy(xpath = "//input[@id='city']")
+    WebElement city;
+
+    @FindBy(xpath = "//select[@id='id_state']")
     WebElement state;
 
     @FindBy(xpath = "//input[@id='postcode']")
@@ -73,7 +76,7 @@ public class CreateAnAccountPage_Demo {
     @FindBy(xpath = "//input[@id='alias']")
     WebElement addressAlias;
 
-    @FindBy(xpath = "//input[@id='submitAccount']")
+    @FindBy(xpath = "//button[@id='submitAccount']")
     WebElement registerButton;
 
     public void selectTitle(WebDriver driver, String title) {
@@ -110,6 +113,72 @@ public class CreateAnAccountPage_Demo {
                 ReusableCommonMethods.selectDropdownValue(driver,dob_months,dobDetails[1].trim()));
         Assert.assertTrue("Day of date of birth is not selected",
                 ReusableCommonMethods.selectDropdownValue(driver,dob_years,dobDetails[2].trim()));
+    }
+
+    public void enterAddressFirstName(WebDriver driver, String addressFirstNameValue) {
+        Assert.assertTrue("Address First Name not entered successfully",
+                ReusableCommonMethods.enterValueInTextBox(addressFirstName, addressFirstNameValue, driver));
+    }
+
+    public void enterAddressLastName(WebDriver driver, String addressLastNameValue) {
+        Assert.assertTrue("Address Last Name not entered successfully",
+                ReusableCommonMethods.enterValueInTextBox(addressLastName, addressLastNameValue, driver));
+    }
+
+    public void enterCompany(WebDriver driver, String companyValue) {
+        Assert.assertTrue("Company not entered successfully",
+                ReusableCommonMethods.enterValueInTextBox(company, companyValue, driver));
+    }
+
+    public void enterAddress1(WebDriver driver, String address1Value) {
+        Assert.assertTrue("Address 1 not entered successfully",
+                ReusableCommonMethods.enterValueInTextBox(address1, address1Value, driver));
+    }
+
+    public void enterAddress2(WebDriver driver, String address2Value) {
+        Assert.assertTrue("Address 2 not entered successfully",
+                ReusableCommonMethods.enterValueInTextBox(address2, address2Value, driver));
+    }
+
+    public void enterCity(WebDriver driver, String cityValue) {
+        Assert.assertTrue("City not entered successfully",
+                ReusableCommonMethods.enterValueInTextBox(city, cityValue, driver));
+    }
+
+    public void selectState(WebDriver driver, String stateValue) {
+        Assert.assertTrue("State not entered successfully",
+                ReusableCommonMethods.selectDropdownValue(driver,state,stateValue));
+    }
+
+    public void enterZipCode(WebDriver driver, String zipValue) {
+        Assert.assertTrue("Zip Code not entered successfully",
+                ReusableCommonMethods.enterValueInTextBox(postCode, zipValue, driver));
+    }
+
+    public void selectCountry(WebDriver driver, String countryValue) {
+        Assert.assertTrue("Country not entered successfully",
+                ReusableCommonMethods.selectDropdownValue(driver,country,countryValue));
+    }
+
+    public void enterHomePhone(WebDriver driver, String homePhoneValue) {
+        Assert.assertTrue("Home Phone not entered successfully",
+                ReusableCommonMethods.enterValueInTextBox(homePhoneNumber, homePhoneValue, driver));
+    }
+
+    public void enterMobilePhone(WebDriver driver, String mobilePhoneValue) {
+        Assert.assertTrue("Mobile Phone not entered successfully",
+                ReusableCommonMethods.enterValueInTextBox(mobilePhoneNumber, mobilePhoneValue, driver));
+    }
+
+    public void enterAddressAlias(WebDriver driver, String addressAliasValue) {
+        Assert.assertTrue("Address Alias Value not entered successfully",
+                ReusableCommonMethods.enterValueInTextBox(addressAlias, addressAliasValue, driver));
+    }
+
+    public void clickOnRegisterButton(WebDriver driver)
+    {
+        Assert.assertTrue("Register button is not clicked",
+                ReusableCommonMethods.clickOnWebElement(driver, registerButton));
     }
 
 }

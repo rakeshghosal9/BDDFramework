@@ -28,6 +28,12 @@ public class SignInPage_Demo {
 
     public void enterEmailAndCreateAnAccount(WebDriver driver,String emailID) {
         try {
+            if(emailID.equalsIgnoreCase("auto-generated"))
+            {
+                emailID = ReusableCommonMethods.generateRandomAlphabaticString(10);
+                emailID = emailID+"@gmail.com";
+                System.out.println("Email ID generated : "+emailID);
+            }
             Assert.assertTrue("Email ID is not entered in create and account text box",
                     ReusableCommonMethods.enterValueInTextBox(createAccountEmailAddress, emailID, driver));
             Assert.assertTrue("Create an account button is not clicked successfully",
