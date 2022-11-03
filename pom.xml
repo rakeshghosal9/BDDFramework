@@ -5,8 +5,8 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>com.trivago.rta</groupId>
-    <artifactId>cucable-test-project</artifactId>
+    <groupId>com.bddframework</groupId>
+    <artifactId>BDDFramework</artifactId>
     <version>1.9.0</version>
     <packaging>jar</packaging>
 
@@ -21,6 +21,8 @@
 
         <generated.runner.directory>${project.build.directory}/parallel/runners</generated.runner.directory>
         <generated.feature.directory>${project.build.directory}/parallel/features</generated.feature.directory>
+        <tag>@default_tag</tag>
+        <feature>src/test/resources/features</feature>
     </properties>
 
     <dependencies>
@@ -35,11 +37,11 @@
             <version>${cucumber.version}</version>
         </dependency>
         <!-- https://mvnrepository.com/artifact/org.seleniumhq.selenium/selenium-java -->
-       <!-- <dependency>
-            <groupId>org.seleniumhq.selenium</groupId>
-            <artifactId>selenium-java</artifactId>
-            <version>3.141.59</version>
-        </dependency>-->
+        <!-- <dependency>
+             <groupId>org.seleniumhq.selenium</groupId>
+             <artifactId>selenium-java</artifactId>
+             <version>3.141.59</version>
+         </dependency>-->
 
         <!-- https://mvnrepository.com/artifact/org.seleniumhq.selenium/selenium-java -->
         <dependency>
@@ -53,9 +55,12 @@
             <artifactId>commons-lang3</artifactId>
             <version>3.8.1</version>
         </dependency>
-
-
-
+        <!-- https://mvnrepository.com/artifact/net.masterthought/cucumber-reporting -->
+        <dependency>
+            <groupId>net.masterthought</groupId>
+            <artifactId>cucumber-reporting</artifactId>
+            <version>5.7.2</version>
+        </dependency>
 
     </dependencies>
 
@@ -81,7 +86,7 @@
                     <!--<sourceRunnerTemplateFile>src/test/resources/cucable.template</sourceRunnerTemplateFile>-->
 
                     <!-- process all features in the given directory -->
-                    <sourceFeatures>src/test/resources/features/automation_practice</sourceFeatures>
+                    <sourceFeatures>src/test/resources/features/${feature}</sourceFeatures>
 
                     <!-- process a specific feature file in the given directory -->
                     <!--<sourceFeatures>src/test/resources/features/testfeature/MyTest9.feature</sourceFeatures>-->
@@ -109,9 +114,10 @@
                     <!-- optional: Cucumber tag expression to include or exclude scenarios with certain tags (see https://docs.cucumber.io/cucumber/api/#tag-expressions) -->
                     <!--<includeScenarioTags>@scenario1Tag1</includeScenarioTags>-->
                     <!--<includeScenarioTags>not @skipMe</includeScenarioTags>-->
-                    <!--<includeScenarioTags>(@scenario1Tag1 or @scenario1Tag2) and not @skipMe</includeScenarioTags>-->
+                    <includeScenarioTags>${tag}</includeScenarioTags>
 
-                    <!--optional: A comma separated list of strings matching a scenario name, either completely or partially. Please see "name" option in Cucumber command-line options-->
+                    <!--optional: A comma separated list of strings matching a scenario name, either completely or partially.
+                    Please see "name" option in Cucumber command-line options-->
                     <!--<scenarioNames>Scenario 1, Scenario 2, Mulțumesc</scenarioNames>-->
 
                     <!-- optional: change parallelization mode of Cucable (default: 'scenarios')-->
@@ -135,6 +141,7 @@
                     <!--<logLevel>compact</logLevel>-->
                     <!--<logLevel>minimal</logLevel>-->
                     <!--<logLevel>off</logLevel>-->
+
                 </configuration>
             </plugin>
             <plugin>
@@ -170,7 +177,7 @@
                     </execution>
                 </executions>
                 <configuration>
-                    <forkCount>2</forkCount>
+                    <forkCount>1</forkCount>
                     <testFailureIgnore>true</testFailureIgnore>
                 </configuration>
             </plugin>
@@ -193,6 +200,15 @@
                         <phase>none</phase>
                     </execution>
                 </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>exec-maven-plugin</artifactId>
+                <version>1.6.0</version>
+                <configuration>
+                    <mainClass>com.report.GenerateReport</mainClass>
+                    <classpathScope>test</classpathScope>
+                </configuration>
             </plugin>
         </plugins>
     </build>

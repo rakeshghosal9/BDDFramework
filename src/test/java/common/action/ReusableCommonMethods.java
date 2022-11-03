@@ -1,31 +1,30 @@
 package common.action;
 
+import io.cucumber.java.Scenario;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.openqa.selenium.*;
-import org.openqa.selenium.interactions.Actions;
-import org.openqa.selenium.support.ui.*;
-import page.objects.AddNewCustomerPage;
+import org.openqa.selenium.support.ui.ExpectedConditions;
+import org.openqa.selenium.support.ui.FluentWait;
+import org.openqa.selenium.support.ui.Select;
+import org.openqa.selenium.support.ui.Wait;
 
-import javax.xml.bind.Element;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.sql.Time;
 import java.time.Duration;
 import java.util.Properties;
+import java.util.Random;
 
 public class ReusableCommonMethods {
 
     /**
      * This method will return a Wait<WebDriver> object of type fluent wait by accepting timeout and polling time
      * as parameter.
-     * @param timeout
-     * @param pollingTime
-     * @param driver
+     * @param timeout - Total wait time by Fluent Wait
+     * @param pollingTime - Polling time is the interval after which Fluent Wait will keep checking
+     * @param driver - WebDriver object
      * @return Wait<WebDriver>
      */
     public static Wait<WebDriver> getFluentWaitObject(int timeout, int pollingTime, WebDriver driver) {
-        return new FluentWait<WebDriver>(driver)
+        return new FluentWait<>(driver)
                 .withTimeout(Duration.ofSeconds(timeout))
                 .pollingEvery(Duration.ofSeconds(pollingTime))
                 .ignoring(NoSuchElementException.class);
@@ -34,11 +33,11 @@ public class ReusableCommonMethods {
     /**
      * This method will return a Wait<WebDriver> object of type fluent wait for which timeout and polling time would
      * be taken from config.properties file.
-     * @param driver
+     * @param driver - WebDriver object
      * @return Wait<WebDriver>
      */
     public static Wait<WebDriver> getFluentWaitObject(WebDriver driver) {
-        return new FluentWait<WebDriver>(driver)
+        return new FluentWait<>(driver)
                 .withTimeout(Duration.ofSeconds(GlobalConfiguration.GLOBAL_EXPLICIT_TIMEOUT))
                 .pollingEvery(Duration.ofSeconds(GlobalConfiguration.GLOBAL_EXPLICIT_POLLING_TIME))
                 .ignoring(NoSuchElementException.class);
@@ -47,9 +46,9 @@ public class ReusableCommonMethods {
     /**
      * This method will wait for a WebElement to be visible using Fluent Wait with timeout time as 60 secs and polling
      *  time as 2 secs.
-     * @param element
-     * @param driver
-     * @param timeout
+     * @param element - The WebElement to be visible
+     * @param driver - WebDriver object
+     * @param timeout - Total wait time by Fluent Wait for the element to be visible
      * @return boolean
      */
     public static boolean waitForElementToBeVisible(WebElement element, WebDriver driver, int timeout) {
@@ -67,10 +66,10 @@ public class ReusableCommonMethods {
 
     /**
      * This method will enter value in a text box WebElement by accepting element, value as parameter.
-     * @param element
-     * @param value
-     * @param driver
-     * @return
+     * @param element - The text box in which value needs to be entered
+     * @param value - Value to be entered in the text box
+     * @param driver - Webdriver object
+     * @return boolean
      */
     public static boolean enterValueInTextBox(WebElement element, String value, WebDriver driver) {
         try {
@@ -89,7 +88,7 @@ public class ReusableCommonMethods {
     /**
      * This method will return a Properties file object that helps to load properties of a Properties file by passing
      * the file path of the Properties file. If the file path is invalid, then it returns null.
-     * @param filePath
+     * @param filePath - Filepath of the properties file
      * @return Properties
      */
     public static Properties getPropertiesFileObject(String filePath) {
@@ -100,15 +99,14 @@ public class ReusableCommonMethods {
                 fis = new FileInputStream(filePath);
                 prop = new Properties();
                 prop.load(fis);
-            } catch (FileNotFoundException fnfe) {
-                fnfe.printStackTrace();
-            } catch (IOException ioe) {
-                ioe.printStackTrace();
+            } catch (Exception e) {
+                e.printStackTrace();
             } finally {
-                fis.close();
+                if (fis != null) {
+                    fis.close();
+                }
             }
             return prop;
-
         } catch (Exception e) {
             System.out.println("Exception occurred while reading properties file : " + e);
             return null;
@@ -117,8 +115,8 @@ public class ReusableCommonMethods {
 
     /**
      *  This method will click on a WebElement using Fluent Wait with global config parameters
-     * @param driver
-     * @param element
+     * @param driver - WebDriver object
+     * @param element - WebElement to be clicked
      * @return boolean
      */
     public static boolean clickOnWebElement(WebDriver driver, WebElement element) {
@@ -137,17 +135,14 @@ public class ReusableCommonMethods {
     /**
      * This method will help to select a dropdown value from a dropdown. It returns false if the dropdown is not
      * present
-     * @param driver
-     * @param element
-     * @param dropdownValue
+     * @param element - WebElement of the dropdown
+     * @param dropdownValue - Value to be selected from the dropdown
      * @return boolean
      */
 
-    public static boolean selectDropdownValue(WebDriver driver,WebElement element, String dropdownValue) {
+    public static boolean selectDropdownValue(WebElement element, String dropdownValue) {
         try {
             System.out.println("Selecting dropdown value : "+dropdownValue);
-            /*Wait<WebDriver> fluentWait = getFluentWaitObject(driver);
-            fluentWait.until(ExpectedConditions.visibilityOf(element));*/
             Select dropdown = new Select(element);
             dropdown.selectByValue(dropdownValue);
             return true;
@@ -160,13 +155,12 @@ public class ReusableCommonMethods {
     /**
      * This method will help to select a dropdown value from a dropdown. It returns false if the dropdown is not
      * present
-     * @param driver
-     * @param element
-     * @param dropdownValue
+     * @param element - Dropdown WebElement
+     * @param dropdownValue - Dropdown value to be selected
      * @return boolean
      */
 
-    public static boolean selectDropdownByVisibleText(WebDriver driver,WebElement element, String dropdownValue) {
+    public static boolean selectDropdownByVisibleText(WebElement element, String dropdownValue) {
         try {
             System.out.println("Selecting dropdown value : "+dropdownValue);
             Select dropdown = new Select(element);
@@ -178,14 +172,48 @@ public class ReusableCommonMethods {
         }
     }
 
-    public static String generateRandomAlphabaticString(int length)
-    {
-        try
-        {
+    /**
+     * This method will generate a Alphabetic String of a maximum length provided as parameter
+     * @param length - the intended length of the random String
+     * @return String
+     */
+
+    public static String generateRandomAlphabaticString(int length) {
+        try {
             return RandomStringUtils.randomAlphabetic(length);
-        }catch (Exception e)
-        {
+        } catch (Exception e) {
             return null;
+        }
+    }
+
+    /**
+     * This method will generate a random integer within a range of 0 to the max length passed as parameter
+     * @param max - the max length of the integer.
+     * @return String
+     */
+    public static int getRandomIntegerBetweenZeroAndGivenMaxInteger(int max) {
+        try {
+            Random rnd = new Random();
+            return rnd.nextInt(max);
+        } catch (Exception e) {
+            return -1;
+        }
+    }
+
+    /**
+     * This method will take a full snanpshot of the current web page and attach with the current Cucumber Scenario
+     * @param driver - Webdriver object
+     * @param scenario - Current Scenario Object
+     */
+    public static void takeScreenshot(WebDriver driver, Scenario scenario) {
+        try {
+            System.out.println("Taking screenshot");
+            // Take a screenshot...
+            byte[] screenshot = ((TakesScreenshot) driver).getScreenshotAs(OutputType.BYTES);
+            // embed it in the report.
+            scenario.attach(screenshot, "image/png", "Screenshot");
+        } catch (Exception e) {
+            System.out.println("Exception occurred while taking screenshot : " + e);
         }
     }
 

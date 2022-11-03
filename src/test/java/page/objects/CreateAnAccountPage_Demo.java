@@ -108,11 +108,11 @@ public class CreateAnAccountPage_Demo {
     public void enterDateOfBirth(WebDriver driver, String dob) {
         String[] dobDetails = dob.split("-");
         Assert.assertTrue("Day of date of birth is not selected",
-                ReusableCommonMethods.selectDropdownValue(driver,dob_days,dobDetails[0].trim()));
+                ReusableCommonMethods.selectDropdownValue(dob_days,dobDetails[0].trim()));
         Assert.assertTrue("Day of date of birth is not selected",
-                ReusableCommonMethods.selectDropdownValue(driver,dob_months,dobDetails[1].trim()));
+                ReusableCommonMethods.selectDropdownValue(dob_months,dobDetails[1].trim()));
         Assert.assertTrue("Day of date of birth is not selected",
-                ReusableCommonMethods.selectDropdownValue(driver,dob_years,dobDetails[2].trim()));
+                ReusableCommonMethods.selectDropdownValue(dob_years,dobDetails[2].trim()));
     }
 
     public void enterAddressFirstName(WebDriver driver, String addressFirstNameValue) {
@@ -147,7 +147,7 @@ public class CreateAnAccountPage_Demo {
 
     public void selectState(WebDriver driver, String stateValue) {
         Assert.assertTrue("State not entered successfully",
-                ReusableCommonMethods.selectDropdownValue(driver,state,stateValue));
+                ReusableCommonMethods.selectDropdownValue(state,stateValue));
     }
 
     public void enterZipCode(WebDriver driver, String zipValue) {
@@ -157,7 +157,7 @@ public class CreateAnAccountPage_Demo {
 
     public void selectCountry(WebDriver driver, String countryValue) {
         Assert.assertTrue("Country not entered successfully",
-                ReusableCommonMethods.selectDropdownValue(driver,country,countryValue));
+                ReusableCommonMethods.selectDropdownValue(country,countryValue));
     }
 
     public void enterHomePhone(WebDriver driver, String homePhoneValue) {
