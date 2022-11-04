@@ -1,6 +1,7 @@
+@USER_REGISTRATION
 Feature: User Registration for Automation Practice
 
-  @USER_REGISTRATION
+
   Scenario: User Registration1
     When click on the sign in link of the homepage
     And enter the registration email address as "auto-generated" and click on create account button

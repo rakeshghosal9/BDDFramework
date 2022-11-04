@@ -7,24 +7,27 @@ import net.masterthought.cucumber.json.support.Status;
 import net.masterthought.cucumber.presentation.PresentationMode;
 
 import java.io.File;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Date;
 import java.util.List;
 
 public class GenerateReport {
 
     public static void main(String args[]) {
         System.out.println("Generating Report");
-        generateReport();
+        String folderName= getTodaysDateAndTime();
+        generateReport(folderName);
     }
 
-    public static void generateReport() {
+    public static void generateReport(String folderName) {
         try {
-            File reportOutputDirectory = new File("target");
+            File reportOutputDirectory = new File("src\\test\\resources\\CucumberReports\\"+folderName);
             List<String> jsonFiles = getJSONFileNames(System.getProperty("user.dir")+"\\target\\cucumber-report\\");
 
             String buildNumber = "1";
-            String projectName = "cucumberProject";
+            String projectName = "BDDFramework";
 
             Configuration configuration = new Configuration(reportOutputDirectory, projectName);
             // optional configuration - check javadoc for details
@@ -77,6 +80,19 @@ public class GenerateReport {
 
         } catch (Exception e) {
             return new ArrayList<>();
+        }
+    }
+
+    public static String getTodaysDateAndTime()
+    {
+        try
+        {
+            SimpleDateFormat formatter = new SimpleDateFormat("dd_MM_yyyy_HH_mm_ss");
+            Date date = new Date();
+            return formatter.format(date);
+        }catch (Exception e)
+        {
+            return null;
         }
     }
 }
