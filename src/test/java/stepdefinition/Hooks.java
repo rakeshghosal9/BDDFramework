@@ -31,6 +31,9 @@ public class Hooks {
     public void launchBrowser(Scenario scenario) {
 
         try {
+            if (driver != null) {
+                driver = null;
+            }
             currentScenario = scenario;
             String URL = null;
             String browser = null;

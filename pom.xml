@@ -23,6 +23,7 @@
         <generated.feature.directory>${project.build.directory}/parallel/features</generated.feature.directory>
         <tag>@default_tag</tag>
         <feature>src/test/resources/features</feature>
+        <forkCount>5</forkCount>
     </properties>
 
     <dependencies>
@@ -61,6 +62,21 @@
             <artifactId>cucumber-reporting</artifactId>
             <version>5.7.2</version>
         </dependency>
+        <!-- https://mvnrepository.com/artifact/org.mariadb.jdbc/mariadb-java-client -->
+        <dependency>
+            <groupId>org.mariadb.jdbc</groupId>
+            <artifactId>mariadb-java-client</artifactId>
+            <version>3.0.8</version>
+        </dependency>
+        <!-- https://mvnrepository.com/artifact/com.googlecode.json-simple/json-simple -->
+        <dependency>
+            <groupId>com.googlecode.json-simple</groupId>
+            <artifactId>json-simple</artifactId>
+            <version>1.1.1</version>
+        </dependency>
+
+
+
 
     </dependencies>
 
@@ -177,7 +193,7 @@
                     </execution>
                 </executions>
                 <configuration>
-                    <forkCount>2</forkCount>
+                    <forkCount>${forkCount}</forkCount>
                     <testFailureIgnore>true</testFailureIgnore>
                 </configuration>
             </plugin>

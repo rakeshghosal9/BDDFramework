@@ -82,7 +82,15 @@ public class UserRegistrationSteps_Demo {
 
     @Then("the registration should be successful")
     public void the_registration_should_be_successful() {
-        MyAccount_Demo myAccountObject = new MyAccount_Demo(driver);
-        myAccountObject.verifyMyAccountPageDisplayed(driver);
+        Assert.fail("Test Failure");
+        /*MyAccount_Demo myAccountObject = new MyAccount_Demo(driver);
+        myAccountObject.verifyMyAccountPageDisplayed(driver);*/
+    }
+
+    @Then("this is a background step")
+    public void backgroundStep() {
+        Assert.fail("Test Failure");
+        /*MyAccount_Demo myAccountObject = new MyAccount_Demo(driver);
+        myAccountObject.verifyMyAccountPageDisplayed(driver);*/
     }
 }

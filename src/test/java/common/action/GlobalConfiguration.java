@@ -11,15 +11,20 @@ public class GlobalConfiguration {
     public static String GRID_URL = null;
     public static String EXECUTION_TYPE = null;
     public static String SAUCE_LAB_URL = null;
+    public static String MY_SQL_DB_CONNECTION = null;
+    public static String WRITE_FAILED_CASES_TO_MYSQL_DB=null;
 
     public GlobalConfiguration() {
-        Properties prop = ReusableCommonMethods.getPropertiesFileObject(System.getProperty("user.dir") + "\\src\\test\\resources\\global_config\\config.properties");
+        Properties prop = ReusableCommonMethods.getPropertiesFileObject(System.getProperty("user.dir") +
+                "\\src\\test\\resources\\global_config\\config.properties");
         GLOBAL_EXPLICIT_TIMEOUT = Integer.parseInt(prop.getProperty("GLOBAL_EXPLICIT_TIMEOUT"));
         GLOBAL_EXPLICIT_POLLING_TIME = Integer.parseInt(prop.getProperty("GLOBAL_EXPLICIT_POLLING_TIME"));
         TAKE_SCREENSHOT_FOR_EACH_STEP = prop.getProperty("TAKE_SCREENSHOT_FOR_EACH_STEP");
         TAKE_SCREENSHOT_ON_FAILURE = prop.getProperty("TAKE_SCREENSHOT_ON_FAILURE");
         GRID_URL = prop.getProperty("GRID_URL");
         EXECUTION_TYPE = prop.getProperty("EXECUTION_TYPE");
-        SAUCE_LAB_URL=prop.getProperty("SAUCE_LAB_URL");
+        SAUCE_LAB_URL = prop.getProperty("SAUCE_LAB_URL");
+        MY_SQL_DB_CONNECTION = prop.getProperty("MY_SQL_DB_CONNECTION");
+        WRITE_FAILED_CASES_TO_MYSQL_DB = prop.getProperty("WRITE_FAILED_CASES_TO_MYSQL_DB");
     }
 }

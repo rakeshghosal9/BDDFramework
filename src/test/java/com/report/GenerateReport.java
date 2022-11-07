@@ -1,31 +1,43 @@
 package com.report;
 
+import common.action.MySQLDBConnection;
 import net.masterthought.cucumber.Configuration;
 import net.masterthought.cucumber.ReportBuilder;
 import net.masterthought.cucumber.Reportable;
 import net.masterthought.cucumber.json.support.Status;
 import net.masterthought.cucumber.presentation.PresentationMode;
+import org.json.simple.JSONArray;
+import org.json.simple.JSONObject;
+import org.json.simple.parser.JSONParser;
 
 import java.io.File;
+import java.io.FileOutputStream;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.sql.SQLException;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 
 public class GenerateReport {
 
-    public static void main(String args[]) {
+    public static List<String> jsonFiles = new ArrayList<>();
+    public static Set<String> failedScenarioNames = new HashSet<>();
+
+    public static void main(String args[]) throws SQLException {
         System.out.println("Generating Report");
-        String folderName= getTodaysDateAndTime();
+        String folderName = getTodaysDateAndTime();
+        jsonFiles = getJSONFileNames(System.getProperty("user.dir") + "\\target\\cucumber-report\\");
+        for (int i = 0; i < jsonFiles.size(); i++) {
+            getScenarioNameWithOverallStatus(jsonFiles.get(i));
+        }
+        generateFailedScenariosJSONFile(failedScenarioNames,System.getProperty("user.dir") +
+                "\\src\\test\\resources\\FailedScenarios\\FailedScenarios_"+folderName);
         generateReport(folderName);
     }
 
     public static void generateReport(String folderName) {
         try {
             File reportOutputDirectory = new File("src\\test\\resources\\CucumberReports\\"+folderName);
-            List<String> jsonFiles = getJSONFileNames(System.getProperty("user.dir")+"\\target\\cucumber-report\\");
-
             String buildNumber = "1";
             String projectName = "BDDFramework";
 
@@ -93,6 +105,97 @@ public class GenerateReport {
         }catch (Exception e)
         {
             return null;
+        }
+    }
+
+    public static boolean getScenarioNameWithOverallStatus(String jsonPath) {
+        JSONParser parser = new JSONParser();
+        try {
+            Object obj = parser.parse(new FileReader(jsonPath));
+            JSONArray jsonArray = (JSONArray) obj;
+            JSONObject jsonObject = (JSONObject) jsonArray.get(0);
+            JSONArray jsonArrayElements = (JSONArray) jsonObject.get("elements");
+            for (int totalSteps = 0; totalSteps < jsonArrayElements.size(); totalSteps++) {
+                jsonObject = (JSONObject) jsonArrayElements.get(totalSteps);
+                jsonArray = (JSONArray) jsonObject.get("steps");
+                if (getResultFromSteps(jsonArray) == false) {
+                    storeFailedScenarios(jsonArrayElements);
+                    return false;
+                }
+            }
+            return true;
+        } catch (Exception e) {
+            System.out.println("Exception : " + e);
+            return false;
+        }
+
+    }
+
+    public static boolean getResultFromSteps(JSONArray jsonArray) {
+        try {
+            for (int step = 0; step < jsonArray.size(); step++) {
+                JSONObject jsonObject = (JSONObject) jsonArray.get(step);
+                JSONObject result = (JSONObject) jsonObject.get("result");
+                String status = (String) result.get("status");
+                System.out.println(status);
+                if (status.equalsIgnoreCase("failed") || status.equalsIgnoreCase("skipped")) {
+                    return false;
+                }
+            }
+            return true;
+
+        } catch (Exception e) {
+            System.out.println("Exception occurred while fetching result status from JSONArray : " + e);
+            return false;
+        }
+    }
+
+    public static boolean generatePropertiesFile(Set<String> failedScenarios,String fileLocation) {
+        try {
+            Properties prop = new Properties();
+            for (String scenarioName : failedScenarios) {
+                prop.put(scenarioName, "FAILED");
+            }
+            //Instantiating the FileInputStream for output file
+            FileOutputStream outputStrem = new FileOutputStream(fileLocation);
+            //Storing the properties file
+            prop.store(outputStrem, "FailedScenarios");
+            System.out.println("Failed Scenarios Created");
+            outputStrem.close();
+            return true;
+
+        } catch (Exception e) {
+            System.out.println("Exception occurred while generating failed Scenarios : " + e);
+            return false;
+        }
+    }
+
+    public static void storeFailedScenarios(JSONArray jsonArrayElements) {
+        try {
+            for (int totalSection = 0; totalSection < jsonArrayElements.size(); totalSection++) {
+                String type = ((JSONObject) jsonArrayElements.get(totalSection)).get("type").toString();
+                if (type.equalsIgnoreCase("scenario")) {
+                    failedScenarioNames.add(((JSONObject) jsonArrayElements.get(totalSection)).get("name").toString());
+                }
+            }
+        } catch (Exception e) {
+            System.out.println("Exception occurred : "+e);
+        }
+    }
+
+    public static boolean generateFailedScenariosJSONFile(Set<String> failedScenarios,String fileLocation) {
+        try {
+            JSONObject jsonObject = new JSONObject();
+            for (String scenarioName : failedScenarios) {
+                jsonObject.put(scenarioName, "Failed");
+            }
+            FileWriter file = new FileWriter(fileLocation);
+            file.write(jsonObject.toJSONString());
+            file.close();
+            return true;
+        } catch (Exception e) {
+            System.out.println("Exception Occurred : " + e);
+            return false;
         }
     }
 }
