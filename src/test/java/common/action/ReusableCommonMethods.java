@@ -217,4 +217,18 @@ public class ReusableCommonMethods {
         }
     }
 
+    /**
+     * This method will generate a Alphanumeric String of a maximum length provided as parameter
+     * @param length - the intended length of the random String
+     * @return String
+     */
+
+    public static String generateRandomAlphnumericString(int length) {
+        try {
+            return RandomStringUtils.randomAlphanumeric(length);
+        } catch (Exception e) {
+            return null;
+        }
+    }
+
 }

@@ -11,8 +11,6 @@ public class GlobalConfiguration {
     public static String GRID_URL = null;
     public static String EXECUTION_TYPE = null;
     public static String SAUCE_LAB_URL = null;
-    public static String MY_SQL_DB_CONNECTION = null;
-    public static String WRITE_FAILED_CASES_TO_MYSQL_DB=null;
 
     public GlobalConfiguration() {
         Properties prop = ReusableCommonMethods.getPropertiesFileObject(System.getProperty("user.dir") +
@@ -24,7 +22,5 @@ public class GlobalConfiguration {
         GRID_URL = prop.getProperty("GRID_URL");
         EXECUTION_TYPE = prop.getProperty("EXECUTION_TYPE");
         SAUCE_LAB_URL = prop.getProperty("SAUCE_LAB_URL");
-        MY_SQL_DB_CONNECTION = prop.getProperty("MY_SQL_DB_CONNECTION");
-        WRITE_FAILED_CASES_TO_MYSQL_DB = prop.getProperty("WRITE_FAILED_CASES_TO_MYSQL_DB");
     }
 }
