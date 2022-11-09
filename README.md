@@ -10,13 +10,11 @@
 
 # BDD Framework
 
-Test project to simulate the behavior of Cucable - a Maven plugin for [Cucumber](https://cucumber.io) scenarios that simplifies parallel test runs.
-
-This test project always uses the latest Cucable version.
+Behavior Driven Development (BDD) Framework enables software testers to complete test scripting in plain English. BDD mainly focuses on the behavior of the product and user acceptance criteria.
 
 ## Introduction
 
-The whole plugin configuration is managed via the pom.xml file in this test project.
+To implement BDD Framework we have used Cucumber. Cucumber is one of the best tools used to develop in the BDD Framework.It uses Gherkin, an ordinary language parser, that permits writing scripts in English that can be easily understood. It is used to run the acceptance tests written in BDD.
 
 ## Technical Details
 
