@@ -18,8 +18,5 @@ To implement BDD Framework we have used Cucumber. Cucumber is one of the best to
 
 ## Technical Details
 
-To run the project you need to have at least Java 8 and Maven 3.3.9 installed on your system.
-
-Just run the Maven command ```mvn clean verify``` to see the runner and feature generation of Cucable in action.
-
-The runner and feature files are generated inside the `target` directory.
+- Minimum Java 1.8 is required. 
+- Selenium 4.0.0 or above is required.
