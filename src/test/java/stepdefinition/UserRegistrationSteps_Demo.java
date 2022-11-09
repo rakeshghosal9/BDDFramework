@@ -89,7 +89,7 @@ public class UserRegistrationSteps_Demo {
 
     @Then("this is a background step")
     public void backgroundStep() {
-        Assert.fail("Test Failure");
+        System.out.println("Background Step");
         /*MyAccount_Demo myAccountObject = new MyAccount_Demo(driver);
         myAccountObject.verifyMyAccountPageDisplayed(driver);*/
     }

@@ -15,6 +15,8 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.FileWriter;
+import java.nio.file.Files;
+import java.nio.file.NoSuchFileException;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.text.SimpleDateFormat;
@@ -23,15 +25,80 @@ import java.util.*;
 public class GenerateReport {
 
     public static List<String> jsonFiles = new ArrayList<>();
+    public static HashMap<String, String> allScenariosWithJSONPath = new HashMap<>();
     public static Set<String> failedScenarioNames = new HashSet<>();
     public static String WRITE_FAILED_CASES_TO_MYSQL_DB = "Yes";
+    //Mention the table name to store failed scenarios in MariaDB in SCHEMA_NAME.TABLE_NAME format
+    public static String failedScenariosTableName = "bdd_framework.execution_statistics";
 
     public static void main(String args[]) throws SQLException {
+
+        //Check if the scenario need not to be rerun
+        jsonFiles = getJSONFileNames(System.getProperty("user.dir") + "\\target\\cucumber-report\\");
+        for (String jsonFileName :
+                jsonFiles) {
+            getAllScenariosWithJSONPath(jsonFileName);
+        }
+        // Create Final Report Directory
+        ReusableCommonMethods.createDirectoryIfNotExists(System.getProperty("user.dir") + "\\target\\final-report");
+        if (System.getProperty("rerunFile") != null && !System.getProperty("rerunFile").isEmpty()) {
+            try {
+                JSONParser parser = new JSONParser();
+                Object obj = parser.parse(new FileReader(System.getProperty("user.dir") +
+                        "\\src\\test\\resources\\FailedScenarios\\" + System.getProperty("rerunFile")));
+                JSONObject failedScenarios = (JSONObject) obj;
+                for (String scenarioName : allScenariosWithJSONPath.keySet()) {
+                    if (failedScenarios.get(scenarioName) != null &&
+                            failedScenarios.get(scenarioName).toString().trim().equalsIgnoreCase("Failed")) {
+                        String newPath = allScenariosWithJSONPath.get(scenarioName).
+                                replace("cucumber-report", "final-report");
+                        copyFile(allScenariosWithJSONPath.get(scenarioName), newPath);
+                    }
+                }
+            }catch (NoSuchFileException NE) {
+                //If the JSON File name provided is not present then copy all the JSON files to Final-Report folder
+                for (String scenarioName : allScenariosWithJSONPath.keySet()) {
+                        String newPath = allScenariosWithJSONPath.get(scenarioName).
+                                replace("cucumber-report", "final-report");
+                        copyFile(allScenariosWithJSONPath.get(scenarioName), newPath);
+                }
+
+            }
+            catch (Exception e) {
+                System.out.println("Exception occurred : " + e);
+            }
+        } else if (System.getProperty("rerunKey") != null && !System.getProperty("rerunKey").isEmpty()) {
+            try {
+                String query = "SELECT SCENARIO_NAME FROM " + failedScenariosTableName + " " +
+                        " WHERE RERUN_KEY = '" + System.getProperty("rerunKey") + "';";
+                HashMap<String, String> failedScenarios = MariaDBConnection.getFailedScenariosByRerunKey(query);
+                for (String scenarioName : allScenariosWithJSONPath.keySet()) {
+                    if (failedScenarios.get(scenarioName) != null &&
+                            failedScenarios.get(scenarioName).equalsIgnoreCase("Failed")) {
+                        String newPath = allScenariosWithJSONPath.get(scenarioName).
+                                replace("cucumber-report", "final-report");
+                        copyFile(allScenariosWithJSONPath.get(scenarioName), newPath);
+                    }
+                }
+            } catch (Exception e) {
+                System.out.println("Exception occurred while getting rerun key scenarios from Maria DB: " + e);
+            }
+        } else {
+            for (String scenarioName : allScenariosWithJSONPath.keySet()) {
+                String newPath = allScenariosWithJSONPath.get(scenarioName).
+                        replace("cucumber-report", "final-report");
+                copyFile(allScenariosWithJSONPath.get(scenarioName), newPath);
+            }
+        }
         System.out.println("Generating Report");
         String folderName = getTodaysDateAndTime();
-        jsonFiles = getJSONFileNames(System.getProperty("user.dir") + "\\target\\cucumber-report\\");
-        for (int i = 0; i < jsonFiles.size(); i++) {
-            getScenarioNameWithOverallStatus(jsonFiles.get(i));
+
+        jsonFiles = new ArrayList<>();
+        jsonFiles = getJSONFileNames(System.getProperty("user.dir") + "\\target\\final-report\\");
+
+        for (String jsonFileName:
+             jsonFiles) {
+            getScenarioNameWithOverallStatus(jsonFileName);
         }
         generateFailedScenariosJSONFile(failedScenarioNames, System.getProperty("user.dir") +
                 "\\src\\test\\resources\\FailedScenarios\\FailedScenarios_" + folderName);
@@ -114,7 +181,7 @@ public class GenerateReport {
         }
     }
 
-    public static boolean getScenarioNameWithOverallStatus(String jsonPath) {
+    public static void getScenarioNameWithOverallStatus(String jsonPath) {
         JSONParser parser = new JSONParser();
         try {
             Object obj = parser.parse(new FileReader(jsonPath));
@@ -124,15 +191,12 @@ public class GenerateReport {
             for (int totalSteps = 0; totalSteps < jsonArrayElements.size(); totalSteps++) {
                 jsonObject = (JSONObject) jsonArrayElements.get(totalSteps);
                 jsonArray = (JSONArray) jsonObject.get("steps");
-                if (getResultFromSteps(jsonArray) == false) {
+                if (!getResultFromSteps(jsonArray)) {
                     storeFailedScenarios(jsonArrayElements);
-                    return false;
                 }
             }
-            return true;
         } catch (Exception e) {
             System.out.println("Exception : " + e);
-            return false;
         }
 
     }
@@ -156,26 +220,6 @@ public class GenerateReport {
         }
     }
 
-    public static boolean generatePropertiesFile(Set<String> failedScenarios, String fileLocation) {
-        try {
-            Properties prop = new Properties();
-            for (String scenarioName : failedScenarios) {
-                prop.put(scenarioName, "FAILED");
-            }
-            //Instantiating the FileInputStream for output file
-            FileOutputStream outputStrem = new FileOutputStream(fileLocation);
-            //Storing the properties file
-            prop.store(outputStrem, "FailedScenarios");
-            System.out.println("Failed Scenarios Created");
-            outputStrem.close();
-            return true;
-
-        } catch (Exception e) {
-            System.out.println("Exception occurred while generating failed Scenarios : " + e);
-            return false;
-        }
-    }
-
     public static void storeFailedScenarios(JSONArray jsonArrayElements) {
         try {
             for (int totalSection = 0; totalSection < jsonArrayElements.size(); totalSection++) {
@@ -189,7 +233,7 @@ public class GenerateReport {
         }
     }
 
-    public static boolean generateFailedScenariosJSONFile(Set<String> failedScenarios, String fileLocation) {
+    public static void generateFailedScenariosJSONFile(Set<String> failedScenarios, String fileLocation) {
         try {
             JSONObject jsonObject = new JSONObject();
             for (String scenarioName : failedScenarios) {
@@ -198,23 +242,22 @@ public class GenerateReport {
             FileWriter file = new FileWriter(fileLocation);
             file.write(jsonObject.toJSONString());
             file.close();
-            return true;
         } catch (Exception e) {
             System.out.println("Exception Occurred : " + e);
-            return false;
         }
     }
 
-    public static void writeFailedScenariosInMySQLDB(Set<String> failedScenarios,String runID) {
+    public static void writeFailedScenariosInMySQLDB(Set<String> failedScenarios, String runID) {
         try {
             Connection conn = MariaDBConnection.getMySQLConnection();
             String rerunKey = generateRerunKey();
             for (String scenarioName :
                     failedScenarios) {
-                String query = "INSERT INTO bdd_framework.execution_statistics VALUES " +
-                        "('"+runID+"','" + scenarioName + "','" + rerunKey + "');";
+                String query = "INSERT INTO "+failedScenariosTableName+" VALUES " +
+                        "('" + runID + "','" + scenarioName + "','" + rerunKey + "');";
                 MariaDBConnection.executeQuery(query, conn);
             }
+            if(conn!=null)
             conn.close();
 
         } catch (Exception e) {
@@ -226,19 +269,52 @@ public class GenerateReport {
         Connection conn = MariaDBConnection.getMySQLConnection();
         String rerunKey = null;
         try {
-            String query = null;
+            String query = "SELECT COUNT(*) FROM "+failedScenariosTableName+" WHERE RERUN_KEY IN ('" + rerunKey + "');";
             while (true) {
                 rerunKey = ReusableCommonMethods.generateRandomAlphnumericString(4);
-                query = "SELECT COUNT(*) FROM bdd_framework.execution_statistics WHERE RERUN_KEY IN ('" + rerunKey + "');";
-                if (MariaDBConnection.validateRecordPresent(query, conn) <= 0) {
+                if (MariaDBConnection.validateRerunKeyPresent(query, conn) <= 0) {
+                    if(conn!=null)
                     conn.close();
                     return rerunKey;
                 }
             }
 
         } catch (Exception e) {
+            if(conn!=null)
             conn.close();
             return rerunKey;
         }
     }
+
+    public static boolean copyFile(String srcFileName, String destFileName) {
+        try {
+            File srcFile = new File(srcFileName);
+            File destFile = new File(destFileName);
+            Files.copy(srcFile.toPath(), destFile.toPath());
+            return true;
+        } catch (Exception e) {
+            System.out.println("Exception occurred : " + e);
+            return false;
+        }
+    }
+
+    public static void getAllScenariosWithJSONPath(String jsonPath) {
+        try {
+            JSONParser parser = new JSONParser();
+            Object obj = parser.parse(new FileReader(jsonPath));
+            JSONArray jsonArray = (JSONArray) obj;
+            JSONObject jsonObject = (JSONObject) jsonArray.get(0);
+            JSONArray jsonArrayElements = (JSONArray) jsonObject.get("elements");
+            for (int i = 0; i < jsonArrayElements.size(); i++) {
+                JSONObject jsonElementObject = (JSONObject) jsonArrayElements.get(i);
+                if (jsonElementObject.get("type") != null &&
+                        jsonElementObject.get("type").toString().trim().equalsIgnoreCase("scenario")) {
+                    allScenariosWithJSONPath.put(jsonElementObject.get("name").toString().trim(), jsonPath);
+                }
+            }
+        } catch (Exception e) {
+            System.out.println("Exception occurred : " + e);
+        }
+    }
+
 }

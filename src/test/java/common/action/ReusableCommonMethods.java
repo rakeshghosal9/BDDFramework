@@ -8,10 +8,13 @@ import org.openqa.selenium.support.ui.FluentWait;
 import org.openqa.selenium.support.ui.Select;
 import org.openqa.selenium.support.ui.Wait;
 
+import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.time.Duration;
 import java.util.Properties;
 import java.util.Random;
+import java.util.Set;
 
 public class ReusableCommonMethods {
 
@@ -228,6 +231,38 @@ public class ReusableCommonMethods {
             return RandomStringUtils.randomAlphanumeric(length);
         } catch (Exception e) {
             return null;
+        }
+    }
+
+    public static void createDirectoryIfNotExists(String directoryPath) {
+        try {
+            File theDir = new File(directoryPath);
+            if (!theDir.exists()) {
+                theDir.mkdirs();
+            }
+        } catch (Exception e) {
+            System.out.println("Unable to create directory [" + directoryPath + "] : " + e);
+
+        }
+    }
+
+    public static boolean generatePropertiesFile(Set<String> failedScenarios, String fileLocation) {
+        try {
+            Properties prop = new Properties();
+            for (String scenarioName : failedScenarios) {
+                prop.put(scenarioName, "FAILED");
+            }
+            //Instantiating the FileInputStream for output file
+            FileOutputStream outputStrem = new FileOutputStream(fileLocation);
+            //Storing the properties file
+            prop.store(outputStrem, "FailedScenarios");
+            System.out.println("Failed Scenarios Created");
+            outputStrem.close();
+            return true;
+
+        } catch (Exception e) {
+            System.out.println("Exception occurred while generating failed Scenarios : " + e);
+            return false;
         }
     }
 
