@@ -15,6 +15,10 @@ public class MariaDBConnection {
     public static String password = "MariaDB@2022";
 
 
+    /**
+     * This method will connect to Maria DB and return a Connection object
+     * @return Connection object
+     */
     public static Connection getMySQLConnection() {
         try {
             return DriverManager.
@@ -26,6 +30,12 @@ public class MariaDBConnection {
         }
     }
 
+    /**
+     * This method will execute a query and return true if the execution was successful
+     * @param query - the query to be executed
+     * @param conn - Maria DB connection
+     * @return boolean
+     */
     public static boolean executeQuery(String query, Connection conn) {
         try {
             Statement stmt = conn.createStatement();
@@ -41,6 +51,12 @@ public class MariaDBConnection {
         }
     }
 
+    /**
+     * This method will return the occurrence of the rerun Key from Maria DB that is generated automatically
+     * @param query - Query to be executed
+     * @param conn - Maria DB connection
+     * @return Integer
+     */
     public static Integer validateRerunKeyPresent(String query, Connection conn) {
         try {
             Statement stmt = conn.createStatement();
@@ -56,6 +72,11 @@ public class MariaDBConnection {
         }
     }
 
+    /**
+     * This method will fetch all the failed scenarios from Maria DB for a given rerunKey
+     * @param query - Query to be executed
+     * @return HashMap<String,String>
+     */
     public static HashMap<String,String> getFailedScenariosByRerunKey(String query) {
         HashMap<String, String> failedScenarios = new HashMap<>();
         try {

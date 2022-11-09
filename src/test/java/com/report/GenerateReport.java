@@ -27,9 +27,14 @@ public class GenerateReport {
     public static List<String> jsonFiles = new ArrayList<>();
     public static HashMap<String, String> allScenariosWithJSONPath = new HashMap<>();
     public static Set<String> failedScenarioNames = new HashSet<>();
+    //Mention is failed scenarios need to be written in Maria DB or not
+    //it should be set as No if you are not using Maria DB
     public static String WRITE_FAILED_CASES_TO_MYSQL_DB = "Yes";
     //Mention the table name to store failed scenarios in MariaDB in SCHEMA_NAME.TABLE_NAME format
     public static String failedScenariosTableName = "bdd_framework.execution_statistics";
+    //Set the below variable as Yes if you want to generate local Cucumber Report
+    //You may set it as No if you are running from Jekins as local report may not be needed in that case
+    public static String generateLocalCucumberReport = "Yes";
 
     public static void main(String args[]) throws SQLException {
 
@@ -40,7 +45,9 @@ public class GenerateReport {
             getAllScenariosWithJSONPath(jsonFileName);
         }
         // Create Final Report Directory
-        ReusableCommonMethods.createDirectoryIfNotExists(System.getProperty("user.dir") + "\\target\\final-report");
+        ReusableCommonMethods.createDirectoryIfNotExists
+                (System.getProperty("user.dir") + "\\target\\final-report");
+        //Check if the rerunFile name was given in the command line
         if (System.getProperty("rerunFile") != null && !System.getProperty("rerunFile").isEmpty()) {
             try {
                 JSONParser parser = new JSONParser();
@@ -67,10 +74,12 @@ public class GenerateReport {
             catch (Exception e) {
                 System.out.println("Exception occurred : " + e);
             }
+            //Check if the rerunKey was given for fetching the failures from Maria DB
         } else if (System.getProperty("rerunKey") != null && !System.getProperty("rerunKey").isEmpty()) {
             try {
                 String query = "SELECT SCENARIO_NAME FROM " + failedScenariosTableName + " " +
                         " WHERE RERUN_KEY = '" + System.getProperty("rerunKey") + "';";
+                //Get the failed scenarios of the rerun key from Maria DB
                 HashMap<String, String> failedScenarios = MariaDBConnection.getFailedScenariosByRerunKey(query);
                 for (String scenarioName : allScenariosWithJSONPath.keySet()) {
                     if (failedScenarios.get(scenarioName) != null &&
@@ -83,6 +92,7 @@ public class GenerateReport {
             } catch (Exception e) {
                 System.out.println("Exception occurred while getting rerun key scenarios from Maria DB: " + e);
             }
+            //If rerunKey and rerunFile was not given, then copy all the JSON files to final-report folder
         } else {
             for (String scenarioName : allScenariosWithJSONPath.keySet()) {
                 String newPath = allScenariosWithJSONPath.get(scenarioName).
@@ -91,26 +101,38 @@ public class GenerateReport {
             }
         }
         System.out.println("Generating Report");
-        String folderName = getTodaysDateAndTime();
+        String folderName = ReusableCommonMethods.getTodaysDateAndTime("dd_MM_yyyy_HH_mm_ss");
 
+        //Initialize the jsonFiles object and then fetch the final report directory JSON files only as we need
+        //to ignore the skipped test cases from rerunKey or rerunFile
         jsonFiles = new ArrayList<>();
         jsonFiles = getJSONFileNames(System.getProperty("user.dir") + "\\target\\final-report\\");
 
+        //Capture the failed scenarios in the current build
         for (String jsonFileName:
              jsonFiles) {
             getScenarioNameWithOverallStatus(jsonFileName);
         }
+        //generate the JSON file under resources/FailedScenarios containing the failed scenarios
         generateFailedScenariosJSONFile(failedScenarioNames, System.getProperty("user.dir") +
                 "\\src\\test\\resources\\FailedScenarios\\FailedScenarios_" + folderName);
+        //write failed scenarios with current date and time as runid in Maria DB
         if (WRITE_FAILED_CASES_TO_MYSQL_DB != null &&
                 WRITE_FAILED_CASES_TO_MYSQL_DB.equalsIgnoreCase("Yes")) {
             writeFailedScenariosInMySQLDB(failedScenarioNames, folderName);
         } else {
             System.out.println("WRITE_FAILED_CASES_TO_MYSQL_DB property is set as NO in global config properties file");
         }
-        generateReport(folderName);
+        //Generate Cucumber Report locally if the property is set as Yes
+        if(generateLocalCucumberReport!=null && generateLocalCucumberReport.equalsIgnoreCase("Yes")) {
+            generateReport(folderName);
+        }
     }
 
+    /**
+     * This method will generate the Cucumber Report. You may set the parameters according to your need.
+     * @param folderName - Folder Path in which cucumber report needs to be generated
+     */
     public static void generateReport(String folderName) {
         try {
             File reportOutputDirectory = new File("src\\test\\resources\\CucumberReports\\" + folderName);
@@ -148,6 +170,11 @@ public class GenerateReport {
         }
     }
 
+    /**
+     * This method will return all the JSON files from a directory given as parameter
+     * @param folderPath - Folder Path from where the JSON files need to be read
+     * @return List<String>
+     */
     public static List<String> getJSONFileNames(String folderPath) {
         try {
             File folder = new File(folderPath);
@@ -171,16 +198,12 @@ public class GenerateReport {
         }
     }
 
-    public static String getTodaysDateAndTime() {
-        try {
-            SimpleDateFormat formatter = new SimpleDateFormat("dd_MM_yyyy_HH_mm_ss");
-            Date date = new Date();
-            return formatter.format(date);
-        } catch (Exception e) {
-            return null;
-        }
-    }
 
+    /**
+     * This method will scan each step of a scenario and validate if a scenario is failed or not.
+     * If the scenario is failed it stores the failed scenario name in a List<String>
+     * @param jsonPath - Full path of the JSON file
+     */
     public static void getScenarioNameWithOverallStatus(String jsonPath) {
         JSONParser parser = new JSONParser();
         try {
@@ -201,6 +224,11 @@ public class GenerateReport {
 
     }
 
+    /**
+     * this method will scan each step and validate if the scenario is failed
+     * @param jsonArray - the JSONArray object of the current step in JSON file
+     * @return true for pass and false if the scenario is failed
+     */
     public static boolean getResultFromSteps(JSONArray jsonArray) {
         try {
             for (int step = 0; step < jsonArray.size(); step++) {
@@ -220,6 +248,10 @@ public class GenerateReport {
         }
     }
 
+    /**
+     * This method will write failed scenario name in a global variable
+     * @param jsonArrayElements - JSONArray object of "element" in the JSON File.
+     */
     public static void storeFailedScenarios(JSONArray jsonArrayElements) {
         try {
             for (int totalSection = 0; totalSection < jsonArrayElements.size(); totalSection++) {
@@ -232,6 +264,12 @@ public class GenerateReport {
             System.out.println("Exception occurred : " + e);
         }
     }
+
+    /**
+     * This method will generate a JSON file containing all the failed scenarios
+     * @param failedScenarios - failed scenario name
+     * @param fileLocation - corresponding JSON file location
+     */
 
     public static void generateFailedScenariosJSONFile(Set<String> failedScenarios, String fileLocation) {
         try {
@@ -247,6 +285,11 @@ public class GenerateReport {
         }
     }
 
+    /**
+     * This method will write all the failed scenarios in Maria DB
+     * @param failedScenarios - Set of all the failed scenarios
+     * @param runID - current date and time in a specific format to be used as run ID in Maria DB
+     */
     public static void writeFailedScenariosInMySQLDB(Set<String> failedScenarios, String runID) {
         try {
             Connection conn = MariaDBConnection.getMySQLConnection();
@@ -265,6 +308,11 @@ public class GenerateReport {
         }
     }
 
+    /**
+     * This method will generate a 4 digit alphanumeric rerun key which is not already existing in the Maria DB
+     * @return String
+     * @throws SQLException
+     */
     public static String generateRerunKey() throws SQLException {
         Connection conn = MariaDBConnection.getMySQLConnection();
         String rerunKey = null;
@@ -286,6 +334,13 @@ public class GenerateReport {
         }
     }
 
+    /**
+     * This method will copy a JSON file from one location to another location
+     * @param srcFileName - source JSON file name
+     * @param destFileName - destination JSON file name
+     * @return true if the copy was successful, false if the copy was failed
+     */
+
     public static boolean copyFile(String srcFileName, String destFileName) {
         try {
             File srcFile = new File(srcFileName);
@@ -297,6 +352,11 @@ public class GenerateReport {
             return false;
         }
     }
+
+    /**
+     * This method will create a HashMap with scenario name as Key and corresponding JSON file location as value
+     * @param jsonPath - full file path of the JSON file
+     */
 
     public static void getAllScenariosWithJSONPath(String jsonPath) {
         try {

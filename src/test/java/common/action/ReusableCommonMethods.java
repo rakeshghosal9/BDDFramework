@@ -11,7 +11,9 @@ import org.openqa.selenium.support.ui.Wait;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
+import java.text.SimpleDateFormat;
 import java.time.Duration;
+import java.util.Date;
 import java.util.Properties;
 import java.util.Random;
 import java.util.Set;
@@ -234,6 +236,10 @@ public class ReusableCommonMethods {
         }
     }
 
+    /**
+     * This method will create a folder/directory that doesn't exist
+     * @param directoryPath - the directory path that needs to be created
+     */
     public static void createDirectoryIfNotExists(String directoryPath) {
         try {
             File theDir = new File(directoryPath);
@@ -246,23 +252,18 @@ public class ReusableCommonMethods {
         }
     }
 
-    public static boolean generatePropertiesFile(Set<String> failedScenarios, String fileLocation) {
-        try {
-            Properties prop = new Properties();
-            for (String scenarioName : failedScenarios) {
-                prop.put(scenarioName, "FAILED");
-            }
-            //Instantiating the FileInputStream for output file
-            FileOutputStream outputStrem = new FileOutputStream(fileLocation);
-            //Storing the properties file
-            prop.store(outputStrem, "FailedScenarios");
-            System.out.println("Failed Scenarios Created");
-            outputStrem.close();
-            return true;
+    /**
+     * This method will return today's date and time in the given format
+     * @return String
+     */
 
+    public static String getTodaysDateAndTime(String format) {
+        try {
+            SimpleDateFormat formatter = new SimpleDateFormat(format);
+            Date date = new Date();
+            return formatter.format(date);
         } catch (Exception e) {
-            System.out.println("Exception occurred while generating failed Scenarios : " + e);
-            return false;
+            return null;
         }
     }
 
