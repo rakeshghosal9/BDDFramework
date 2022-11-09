@@ -2,9 +2,9 @@
 <!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
 **Table of Contents** 
 
-- [BDD Framework](# BDD Framework)
-  - [Introduction](# Introduction)
-  - [Technical Details](# Technical Details)
+- [BDD Framework](#BDD Framework)
+  - [Introduction](#Introduction)
+  - [Technical Details](#Technical Details)
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
