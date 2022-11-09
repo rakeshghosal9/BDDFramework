@@ -10,13 +10,11 @@ import org.openqa.selenium.support.ui.Wait;
 
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileOutputStream;
 import java.text.SimpleDateFormat;
 import java.time.Duration;
 import java.util.Date;
 import java.util.Properties;
 import java.util.Random;
-import java.util.Set;
 
 public class ReusableCommonMethods {
 
@@ -264,6 +262,43 @@ public class ReusableCommonMethods {
             return formatter.format(date);
         } catch (Exception e) {
             return null;
+        }
+    }
+
+    /**
+     * This method will click on the WebElement using JavaScript Executor
+     * @param driver
+     * @param element
+     * @return boolean
+     */
+
+    public static boolean javaScriptExecutorClick(WebDriver driver,WebElement element) {
+        try {
+            JavascriptExecutor js = (JavascriptExecutor) driver;
+            js.executeScript("arguments[0].click();", element);
+            return true;
+        } catch (Exception e) {
+            System.out.println("Exception occurred while clicking element using JavaScript : " + e);
+            return false;
+
+        }
+    }
+
+    /**
+     * This method will perform web page scroll by the pixel given using JavaScript Executor
+     * @param driver
+     * @param pixel
+     * @return boolean
+     */
+    public static boolean javaScriptExecutorScrollDown(WebDriver driver,int pixel) {
+        try {
+            JavascriptExecutor js = (JavascriptExecutor) driver;
+            js.executeScript("window.scrollBy(0,"+pixel+")");
+            return true;
+        } catch (Exception e) {
+            System.out.println("Exception occurred while scrolling down the webpage : " + e);
+            return false;
+
         }
     }
 
