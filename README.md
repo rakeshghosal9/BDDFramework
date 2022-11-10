@@ -83,9 +83,27 @@ From a technical aspect, we have a GlobalConfiguration java class that reads con
 
 In real project we deal with multiple environments such as Dev, Integration, QA, UAT, Production etc. All these environments usually have multiple URLs, Database Parameters etc. To handle this we need to create properties file for each environment and put it into **src/test/resources/environments** folder. As of now only **URL** and **BROWSER** - these 2 parameters must be mentioned in each environment properties file.
 
-We need to pass the environment in which we would like to run our tests in Maven Command **(For Example -Denv = "INTG1")**, in code we read the corresponding properties file from **@Before** hooks in **Hooks.java** from the stepdefition folder. 
+We need to pass the environment in which we would like to run our tests in Maven Command **(For Example -Denv = "INTG1")**, in code we read the corresponding properties file from **@Before** hooks in **Hooks.java** inside the stepdefition folder. 
 
-**Note :** If we pass -Denv="INTG1" in the Maven Command line for an example, then there must be a properties file name **INTG1.properties** should be present in **src\test\resources\environments** folder. 
+**Note :** If we pass **-Denv="INTG1"** in the Maven Command line for an example, then there must be a properties file name **INTG1.properties** present in **src\test\resources\environments** folder. 
+## Browsers Supported
+
+As of now the framework can support Chrome, Firefox and Edge browsers. We need to define the browser in the **environment.properties** file as mentioned in the previous section. Valid values for BROWSER are:
+
+         CHROME - to execute tests on Chrome Browser.
+         FIREFOX - to execute tests on Firefox Browser. 
+         EDGE - to execute tests on Edge Browser. 
+         RANDOM - if we mention the browser as RANDOM, then the test will run on any of these above browsers. 
+
+Please note we need to download the executable drivers for Chrome, Firefox and Edge in **src/test/resources/drivers** folder according to your browser version, this is required to run the tests locally. You can find the drivers from below:
+
+- Chrome - [Click Here](#https://chromedriver.chromium.org/downloads)
+- Firefox - [Click Here](#https://github.com/mozilla/geckodriver/releases)
+- Edge - [Click Here](#https://developer.microsoft.com/en-us/microsoft-edge/tools/webdriver/)
+
+**Note :** Please note that Selenium has recently launched Selenium Manager from version 4.6.0 with which there is no need to download the executable drivers anymore to launch these browsers, Selenium itself can handle it. But as this is under beta version we have still not implemented, once the version is stabilized we will implement in our framework.
+
+
 ## About Me
 
 My Name is Rakesh Ghosal. I'm a Test Automation Architect with total 10 years of experience. During my career I have built many test automation framework such as BDDFramework, Keyword Driven Framework, Data Driven Framework. I'm passionate about technologies and love to learn  new skill whenever get time. 
