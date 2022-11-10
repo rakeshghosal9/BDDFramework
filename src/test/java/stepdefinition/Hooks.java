@@ -266,7 +266,29 @@ public class Hooks {
         try {
             String nodeURL = GlobalConfiguration.GRID_URL;
             EdgeOptions options = new EdgeOptions();
-            options.setCapability("platformName", "Windows 10");
+            //options.setCapability("platformName", "Windows 10");
+            WebDriver driver = new RemoteWebDriver(new URL(nodeURL), options);
+            driver.manage().window().maximize();
+            return driver;
+        } catch (Exception e) {
+            System.out.println("Exception occurred while launching remote browser : " + e);
+            return null;
+        }
+    }
+
+    /**
+     * This method will launch a Firefox browser on Selenium Grid
+     *
+     * @return WebDriver
+     */
+
+    public WebDriver launchRemoteFirefoxDriver() {
+        try {
+            String nodeURL = GlobalConfiguration.GRID_URL;
+            FirefoxOptions options = new FirefoxOptions();
+            String strFFBinaryPath = "C:\\Program Files (x86)\\Mozilla Firefox\\firefox.exe";
+            options.setBinary(strFFBinaryPath);
+            //options.setCapability("platformName", "Windows 10");
             WebDriver driver = new RemoteWebDriver(new URL(nodeURL), options);
             driver.manage().window().maximize();
             return driver;
@@ -371,7 +393,7 @@ public class Hooks {
      */
     public void stepsToLaunchFirefoxBrowser(String URL) {
         if (GlobalConfiguration.EXECUTION_TYPE.equalsIgnoreCase("REMOTE")) {
-            //driver = launchRemoteEdgeDriver();
+            driver = launchRemoteFirefoxDriver();
         } else if (GlobalConfiguration.EXECUTION_TYPE.equalsIgnoreCase("SAUCELAB")) {
             System.out.println("Launching firefox browser on Sauce Lab");
             driver = launchFirefoxOnSauceLab();
