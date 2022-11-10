@@ -10,7 +10,7 @@ Behavior Driven Development (BDD) Framework enables software testers to complete
 
 - [Prerequisites](#Prerequisites)
 - [Maven Dependencies](#Maven-Dependencies)
-- Project hierarchy
+- [Project Hierarchy](#Project-Hierarchy)
 - Global Configurations
 - Environment Configurations
 - Browsers Supported
@@ -34,6 +34,18 @@ Maven Dependencies are mentioned in the pom.xml of a maven project. We are using
 - Selenium - 4.4.0 (Selenium 4)
 
 Please check pom.xml for other dependencies. 
+## Project Hierarchy
+
+Please find below the project structure. 
+
+- src/test/java
+ 
+           com.report - Java classes related to report generation.
+           common.action - Reusable Java methods, DB Connection, Global Configuration Initialization.
+           page.objects - To store the WebElements and corresponding actions.
+           runner - Sample JUnit runner for debugging purpose.
+           some.template - JUnit runner template based on which the runner will be generated automatically.
+           stepdefinition - Java classes to store step definitions.
 ## About Me
 
 My Name is Rakesh Ghosal. I'm a Test Automation Architect with total 10 years of experience. During my career I have built many test automation framework such as BDDFramework, Keyword Driven Framework, Data Driven Framework. I'm passionate about technologies and love to learn  new skill whenever get time. 
