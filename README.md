@@ -8,19 +8,39 @@ Behavior Driven Development (BDD) Framework enables software testers to complete
 
 ## Content
 
+- [Highlights](#Highlights)
 - [Prerequisites](#Prerequisites)
 - [Maven Dependencies](#Maven-Dependencies)
 - [Project Hierarchy](#Project-Hierarchy)
 - [Global Configurations](#Global-Configuration)
 - [Environment Configuration](#Environment-Configuration)
-- Browsers Supported
-- Execution Types
+- [Browsers Supported](#Browsers-Supported)
+- [Page Object Model Implementation](#Page-Object-Model-Implementation)
 - Running Tests
 - Report Generation
 - Rerun Failed Tests
 
 
 
+## Highlights
+
+Let's see what are the features that you will get in this Framework.
+
+- Usage of Selenium 4 and it's latest features. 
+- Junit Framework.
+- Support BDD style using Cucumber, easy to read feature files for all stakeholder, writted in plain english. 
+- The Framework is built on Maven, hence all the dependencies are automatically downloaded and no need to do any manual set up. 
+- Followed Page Object Model that provides easy initialization of WebElements using Page Factory design pattern. 
+- Multi-browser support (Chrome, Firefox and Edge) for execution. 
+- Ability to execute test on Selenium Grid, Saucelab and locally. 
+- Easy to configure parameters from properties file. 
+- Ability to define parameters for various environments.
+- Support parallel execution with ability to decide the number of threads.
+- Generation of JSON report for each scenario which can be used to generate most of the external reports. 
+- Generation of Cucumber Report in a folder with date and time.
+- Ability to rerun the failures. 
+- Various reusable methods available such as Click, Selection of dropdown, Enter value in textbox etc. 
+- Maria DB connection available. 
 ## Prerequisites
  - JDK 1.8 or above installed on the machine.
  - Maven installed.
@@ -103,7 +123,51 @@ Please note we need to download the executable drivers for Chrome, Firefox and E
 
 **Note :** Please note that Selenium has recently launched Selenium Manager from version 4.6.0 with which there is no need to download the executable drivers anymore to launch these browsers, Selenium itself can handle it. But as this is under beta version we have still not implemented, once the version is stabilized we will implement in our framework.
 
+Now let's talk about Selenium Grid execution. In this case you need to download the executable drivers on the node machine that you want to connect to the Selenium Hub. I would suggest to go through the Selenium Grid concept from any of the tutorial page over the internet. I prefer from [here](#https://www.guru99.com/introduction-to-selenium-grid.html), but you are open to explore other options. To help you with the command that I prefer to connect my Grid Node with the Grid Hub is given below:
 
+- Chrome
+
+           java -Dwebdriver.chrome.driver=chromedriver.exe -jar selenium-server-standalone-3.141.59.jar -port 5564 -role node -hub http://123.456.7.8:4444/grid/register/ -browser "browserName=MicrosoftEdge,version=ANY,maxInstances=5,platform=WINDOWS" -maxSession 5
+
+- Firefox
+
+           java -Dwebdriver.gecko.driver=geckodriver.exe -jar selenium-server-standalone-3.141.59.jar -port 5564 -role node -hub http://123.456.7.8:4444/grid/register/ -browser "browserName=Firefox,version=ANY,maxInstances=5,platform=WINDOWS" -maxSession 5
+- Edge
+
+           java -Dwebdriver.edge.driver=msedgedriver.exe -jar selenium-server-standalone-3.141.59.jar -port 5564 -role node -hub http://123.456.7.8:4444/grid/register/ -browser "browserName=MicrosoftEdge,version=ANY,maxInstances=5,platform=WINDOWS" -maxSession 5
+
+
+And talking about the last option Saucelab, you need not to worry about drivers. You just need an account on Saucelab and need to provide the Saucelab connection url in config.properties. 
+
+
+## Page Object Model Implementation
+
+Let's discuss how we have implemented Page Object Mode in this framework. As mentioned in the project structure we have a package named **"page.objects"** under **src/test/java**. In Page Onject Model we should create one Java Class for each Page and capture all the WebElements of the Page. Now, surely we can perform various oprarations on that Page. All these operations should be defined as Java Method in the same class. 
+
+For Example we have a Login Page in which we have User ID and Password as textbox and a Submit button. In this case we should create a java class, let's say LoginPage.java. We should capture below WebElements:
+
+- Identifier (id,name,xpath etc. ) for User ID text box.
+- Identifier for Password text box. 
+- Identifier for Submit button. 
+
+And below three java methods to define the operations.
+
+- method to enter value in User ID. 
+- method to enter value in Password. 
+- method to click on Submit button. 
+
+Now the question is how shall we initialize the Page Object. Ideally it should be done from the Step Definition file. To give you a background, Step Definition file is a Java class in which we should write code for each step that is written in the Cucumber Feature File. 
+
+In a Page Object java class, we initialize the WebElements within it's constructor. Please find below the sample code. 
+
+        public UserRegistration_Para(WebDriver driver) {
+             this.driver = driver;
+             PageFactory.initElements(driver, this);
+    }
+
+So, when we create an object of this class UserRegistration_Para.java, the constructor is getting called automatically and using the PageFactory, all the WebElements are initialized. 
+
+Page Object Mode is a big topic to cover, if you would like to know more, you may visit [here](#https://www.guru99.com/page-object-model-pom-page-factory-in-selenium-ultimate-guide.html).
 ## About Me
 
 My Name is Rakesh Ghosal. I'm a Test Automation Architect with total 10 years of experience. During my career I have built many test automation framework such as BDDFramework, Keyword Driven Framework, Data Driven Framework. I'm passionate about technologies and love to learn  new skill whenever get time. 
