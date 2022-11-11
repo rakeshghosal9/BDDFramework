@@ -16,7 +16,8 @@ Behavior Driven Development (BDD) Framework enables software testers to complete
 - [Environment Configuration](#Environment-Configuration)
 - [Browsers Supported](#Browsers-Supported)
 - [Page Object Model Implementation](#Page-Object-Model-Implementation)
-- Running Tests
+- [How Cucable Works](#How-Cucable-Works)
+- [Running Tests](#Running-Test)
 - Report Generation
 - Rerun Failed Tests
 
@@ -117,13 +118,13 @@ As of now the framework can support Chrome, Firefox and Edge browsers. We need t
 
 Please note we need to download the executable drivers for Chrome, Firefox and Edge in **src/test/resources/drivers** folder according to your browser version, this is required to run the tests locally. You can find the drivers from below:
 
-- Chrome - [Click Here](#https://chromedriver.chromium.org/downloads)
-- Firefox - [Click Here](#https://github.com/mozilla/geckodriver/releases)
-- Edge - [Click Here](#https://developer.microsoft.com/en-us/microsoft-edge/tools/webdriver/)
+- Chrome - [Click Here](https://chromedriver.chromium.org/downloads)
+- Firefox - [Click Here](https://github.com/mozilla/geckodriver/releases)
+- Edge - [Click Here](https://developer.microsoft.com/en-us/microsoft-edge/tools/webdriver/)
 
 **Note :** Please note that Selenium has recently launched Selenium Manager from version 4.6.0 with which there is no need to download the executable drivers anymore to launch these browsers, Selenium itself can handle it. But as this is under beta version we have still not implemented, once the version is stabilized we will implement in our framework.
 
-Now let's talk about Selenium Grid execution. In this case you need to download the executable drivers on the node machine that you want to connect to the Selenium Hub. I would suggest to go through the Selenium Grid concept from any of the tutorial page over the internet. I prefer from [here](#https://www.guru99.com/introduction-to-selenium-grid.html), but you are open to explore other options. To help you with the command that I prefer to connect my Grid Node with the Grid Hub is given below:
+Now let's talk about Selenium Grid execution. In this case you need to download the executable drivers on the node machine that you want to connect to the Selenium Hub. I would suggest to go through the Selenium Grid concept from any of the tutorial page over the internet. I prefer from [here](https://www.guru99.com/introduction-to-selenium-grid.html), but you are open to explore other options. To help you with the command that I prefer to connect my Grid Node with the Grid Hub is given below:
 
 - Chrome
 
@@ -167,7 +168,25 @@ In a Page Object java class, we initialize the WebElements within it's construct
 
 So, when we create an object of this class UserRegistration_Para.java, the constructor is getting called automatically and using the PageFactory, all the WebElements are initialized. 
 
-Page Object Mode is a big topic to cover, if you would like to know more, you may visit [here](#https://www.guru99.com/page-object-model-pom-page-factory-in-selenium-ultimate-guide.html).
+Page Object Mode is a big topic to cover, if you would like to know more, you may visit [here](https://www.guru99.com/page-object-model-pom-page-factory-in-selenium-ultimate-guide.html).
+## How Cucable Works
+
+Let's talk about running test now. We are using Cucable plugin to run our test. You can learn more about this plugin from [here](https://github.com/trivago/cucable-plugin).
+
+But let's breif about it. Cucable is a maven plugin that helps to generate JUnit runners on the fly. Cucable scans the feature files you have created and finds the scenarios matching with the tag given. Cucuable uses a template to generate the JUnit runner file. We have kept it in **src\test\java\some\template** folder. In our template we have put below :
+
+     glue - defines the package name of the step definition.
+     features - defines the feature file name to be executed. 
+     plugin - defines that a JSON report needs to be generated post execution. 
+
+
+Now as mentioned earlier, as per the matching tag, Cucuable will generate one single feature file for each scenario and one individual runner to run that feature file. 
+
+Seems confusing? Let's explain with an example. Let's say we have 5 feature files each containing 3 scenarios, total 15 scenarios. Out of 15 scenario 10 scenarios are having a tag **@TEST_TO_RUN**. Now, we have provided tag **@TEST_TO_RUN** in the maven command. Cucuable will scan all the 15 scenarios and found that 10 scenarios are matching with the given tag. Cucable will create 10 separate feature files for these 10 matching scenarios containing one scenario in each feature file. It also creates 10 different JUnit runners and link each runner to a single feature file. So, now we have 10 feature files and 10 corresponding runner files. Cucable is now ready for the execution. If we mention the fork count as 5, Cucuable will run 5 JUnit runners at the same time in parallel. 
+
+## Running-Test
+
+
 ## About Me
 
 My Name is Rakesh Ghosal. I'm a Test Automation Architect with total 10 years of experience. During my career I have built many test automation framework such as BDDFramework, Keyword Driven Framework, Data Driven Framework. I'm passionate about technologies and love to learn  new skill whenever get time. 
