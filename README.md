@@ -18,8 +18,8 @@ Behavior Driven Development (BDD) Framework enables software testers to complete
 - [Page Object Model Implementation](#Page-Object-Model-Implementation)
 - [How Cucable Works](#How-Cucable-Works)
 - [Running Tests](#Running-Test)
-- Report Generation
-- Rerun Failed Tests
+- [Report Generation](#Report-Generation)
+- [Rerun Failed Tests](#Rerun-Failed-Tests)
 
 
 
@@ -171,7 +171,7 @@ So, when we create an object of this class UserRegistration_Para.java, the const
 Page Object Mode is a big topic to cover, if you would like to know more, you may visit [here](https://www.guru99.com/page-object-model-pom-page-factory-in-selenium-ultimate-guide.html).
 ## How Cucable Works
 
-Let's talk about running test now. We are using Cucable plugin to run our test. You can learn more about this plugin from [here](https://github.com/trivago/cucable-plugin).
+Let's talk how Cucable works. We are using Cucable plugin to run our test. You can learn more about this plugin from [here](https://github.com/trivago/cucable-plugin).
 
 But let's breif about it. Cucable is a maven plugin that helps to generate JUnit runners on the fly. Cucable scans the feature files you have created and finds the scenarios matching with the tag given. Cucuable uses a template to generate the JUnit runner file. We have kept it in **src\test\java\some\template** folder. In our template we have put below :
 
@@ -184,10 +184,46 @@ Now as mentioned earlier, as per the matching tag, Cucuable will generate one si
 
 Seems confusing? Let's explain with an example. Let's say we have 5 feature files each containing 3 scenarios, total 15 scenarios. Out of 15 scenario 10 scenarios are having a tag **@TEST_TO_RUN**. Now, we have provided tag **@TEST_TO_RUN** in the maven command. Cucuable will scan all the 15 scenarios and found that 10 scenarios are matching with the given tag. Cucable will create 10 separate feature files for these 10 matching scenarios containing one scenario in each feature file. It also creates 10 different JUnit runners and link each runner to a single feature file. So, now we have 10 feature files and 10 corresponding runner files. Cucable is now ready for the execution. If we mention the fork count as 5, Cucuable will run 5 JUnit runners at the same time in parallel. 
 
-## Running-Test
+## Running Test
+
+There are 2 ways to execute a test. Using a JUnit Runner class or using Maven command line. 
+
+To run with a JUnit Runner class we can use the runner file named **debug.java** in **src/test/java/runner**. You just need to glue and feature file location. Recommended is to use this runner class for debugging purpose.
+
+To run using Maven Command, here is an example for you. Let's exaplin each one of them in details. 
+
+    clean verify -Denv=INTG2 -Dtag=@USER_REGISTRATION_PARA_BANK -Dfeature=parabank -DforkCount=1 exec:java
+
+- clean : It's a Maven Phase with which at the begining the target folder of the frameowrk will be cleaned. 
+- verify : It's a validation phase of Maven to build the project. It includes compilation of all the java files and then execute the test. 
+- -Denv : As mentioned in the [Environment Configuration](#Environment-Configuration) section, we need to pass the environment in which we need to execute the test. Please note "-D" is mandatory to define a system parameter. We can access this parameter using **System.getProperty("env")** .
+- -Dtag : Define the tag that you want to run from the Cucumber feature files. 
+- -Dfeature : Define the feature folder. Let's say you have 5 feature files directory, but you want the system to scan only one folder, in that case you can mention the directory here. 
+- -DforkCount : Fork Count is used to define the number of max threads that can be run in parallel. By default it's value is set to 5. 
+- exec:java : It's a maven plugin to execute a java class having main method. We are invoking **GenerateReport.java** class at the end of the execution to generate report and some other activities that you will see later. It's very important that you mention during the execution. 
+
+**Note :** Please note that default value of tag, feature and forkCount is mentioned in pom.xml. Just for your reference, please search below in pom.xml. 
+
+
+        <tag>@default_tag</tag>
+        <feature>src/test/resources/features</feature>
+        <forkCount>5</forkCount>
+## Report Generation
+
+As mentioned earlier Cucuable generates one JSON report for each scenario. We execute **GenerateReport.java** at the end and read these JSON files and generate Cucumber Report. 
+
+There is a global variable named **generateLocalCucumberReport** in the GenerateReport.java. You may set it as "Yes" if you want to generate the report and "No" if you don't want to. While executing from Jenkins it's recommended to set this paramter as "No" because Jenkins itself has capability to scan these JSON files and generate Cucumber Report. 
+
+Please note there are some optional paramters available in the code which you may update as per your need. Please refer **generateReport()** method in **GenerateReport.java** for more details. Here are the optional paramters for your reference. 
+
+    configuration.addClassifications("Platform", "Windows");
+    configuration.addClassifications("Browser", "Firefox");
+    configuration.addClassifications("Branch", "release/1.0");
 
 
 ## About Me
 
 My Name is Rakesh Ghosal. I'm a Test Automation Architect with total 10 years of experience. During my career I have built many test automation framework such as BDDFramework, Keyword Driven Framework, Data Driven Framework. I'm passionate about technologies and love to learn  new skill whenever get time. 
 
+
+## Rerun Failed Tests
