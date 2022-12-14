@@ -29,12 +29,12 @@ public class GenerateReport {
     public static Set<String> failedScenarioNames = new HashSet<>();
     //Mention is failed scenarios need to be written in Maria DB or not
     //it should be set as No if you are not using Maria DB
-    public static String WRITE_FAILED_CASES_TO_MYSQL_DB = "Yes";
+    public static String WRITE_FAILED_CASES_TO_MYSQL_DB = "No";
     //Mention the table name to store failed scenarios in MariaDB in SCHEMA_NAME.TABLE_NAME format
     public static String failedScenariosTableName = "bdd_framework.execution_statistics";
     //Set the below variable as Yes if you want to generate local Cucumber Report
     //You may set it as No if you are running from Jekins as local report may not be needed in that case
-    public static String generateLocalCucumberReport = "Yes";
+    public static String generateLocalCucumberReport = "No";
 
     public static void main(String args[]) throws SQLException {
 

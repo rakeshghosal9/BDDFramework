@@ -182,8 +182,9 @@ public class Hooks {
      */
     public WebDriver launchChromeBrowser() {
         try {
-            System.setProperty("webdriver.chrome.driver", System.getProperty("user.dir") +
-                    "\\src\\test\\resources\\drivers\\chromedriver\\chromedriver.exe");
+            //Commenting out as for Selenium Manager it's not required
+            /*System.setProperty("webdriver.chrome.driver", System.getProperty("user.dir") +
+                    "\\src\\test\\resources\\drivers\\chromedriver\\chromedriver.exe");*/
             driver = new ChromeDriver();
             driver.manage().window().maximize();
             return driver;
