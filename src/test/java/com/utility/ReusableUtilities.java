@@ -96,12 +96,12 @@ public class ReusableUtilities {
             {
                 row = sheet.createRow((i+1));
                 row.createCell(0).setCellValue(stockName.get(i));
-                row.createCell(1).setCellValue(consolidatedData.get(i).get("CUR_INDEX"));
+                row.createCell(1).setCellValue(convertDouble(consolidatedData.get(i).get("CUR_INDEX")));
                 row.createCell(2).setCellValue(consolidatedData.get(i).get("TODAYS_CHANGE"));
-                row.createCell(3).setCellValue(consolidatedData.get(i).get("WEEK_HIGH"));
-                row.createCell(4).setCellValue(consolidatedData.get(i).get("WEEK_LOW"));
-                row.createCell(5).setCellValue(consolidatedData.get(i).get("HIGH_MINUS_CURRENT_INDEX"));
-                row.createCell(6).setCellValue(consolidatedData.get(i).get("CURRENT_INDEX_MINUS_LOW"));
+                row.createCell(3).setCellValue(convertDouble(consolidatedData.get(i).get("WEEK_HIGH")));
+                row.createCell(4).setCellValue(convertDouble(consolidatedData.get(i).get("WEEK_LOW")));
+                row.createCell(5).setCellValue(convertDouble(consolidatedData.get(i).get("HIGH_MINUS_CURRENT_INDEX")));
+                row.createCell(6).setCellValue(convertDouble(consolidatedData.get(i).get("CURRENT_INDEX_MINUS_LOW")));
             }
 
             FileOutputStream outputStream = new FileOutputStream(filePath);
@@ -114,4 +114,14 @@ public class ReusableUtilities {
             System.out.println("Exception occurred : "+e);
         }
     }
+
+    public static double convertDouble(String value) {
+        try {
+            return Double.parseDouble(value);
+        } catch (Exception e) {
+            return Double.valueOf(value);
+        }
+
+    }
+
 }

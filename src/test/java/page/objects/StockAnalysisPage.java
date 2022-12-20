@@ -3,6 +3,9 @@ package page.objects;
 import com.utility.ReusableUtilities;
 import common.action.ReusableCommonMethods;
 import io.cucumber.java.eo.Do;
+import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.ss.usermodel.Sheet;
+import org.apache.poi.ss.usermodel.Workbook;
 import org.openqa.selenium.Keys;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
@@ -10,7 +13,9 @@ import org.openqa.selenium.support.FindBy;
 import org.openqa.selenium.support.PageFactory;
 import stepdefinition.StockAnalysisSteps;
 
+import java.io.FileOutputStream;
 import java.util.HashMap;
+import java.util.List;
 
 public class StockAnalysisPage {
 
@@ -74,11 +79,11 @@ public class StockAnalysisPage {
             tempData.put("WEEK_LOW",convertDouble(weeklow52.getText().trim().replaceAll(",","")));*/
             String weekHigh52Data = weekHigh52.getText().trim();
             weekHigh52Data = weekHigh52Data.replaceAll(",","");
-            double weekHighDouble = convertDouble(weekHigh52Data);
+            double weekHighDouble = ReusableUtilities.convertDouble(weekHigh52Data);
             String weekLow52Data = weeklow52.getText().trim();
             weekLow52Data = weekLow52Data.replaceAll(",","");
-            double weekLowDouble = convertDouble(weekLow52Data);
-            double currentIndexDouble = convertDouble(currentIndex.getText().trim().replaceAll(",",""));
+            double weekLowDouble = ReusableUtilities.convertDouble(weekLow52Data);
+            double currentIndexDouble = ReusableUtilities.convertDouble(currentIndex.getText().trim().replaceAll(",",""));
             tempData.put("HIGH_MINUS_CURRENT_INDEX",""+ReusableUtilities.sub(weekHighDouble,currentIndexDouble));
             tempData.put("CURRENT_INDEX_MINUS_LOW",""+ReusableUtilities.sub(currentIndexDouble,weekLowDouble));
             StockAnalysisSteps.consolidatedData.add(tempData);
@@ -87,12 +92,32 @@ public class StockAnalysisPage {
         }
     }
 
-    public double convertDouble(String value) {
-        try {
-            return Double.parseDouble(value);
-        } catch (Exception e) {
-            return Double.valueOf(value);
-        }
+    public void writeTodaysChangeInLastColumn(List<HashMap<String,String>> consolidatedData, List<String> allStocks, String sheetName)
+    {
+        try
+        {
+            Workbook workbook = ReusableUtilities.getWorkbookObject(System.getProperty("user.dir")+
+                    "\\src\\test\\resources\\OtherData\\StockName.xlsx");
+            Sheet sheet = workbook.getSheet(sheetName);
+            Row row = sheet.getRow(0);
+            int lastColumn = row.getLastCellNum();
+            String todaysDate = ReusableCommonMethods.getTodaysDateAndTime("dd/MM/yyyy");
+            row.createCell(lastColumn).setCellValue(todaysDate);
+            for(int i=0;i<allStocks.size();i++)
+            {
+                row = sheet.getRow(i+1);
+                row.createCell(lastColumn).setCellValue(consolidatedData.get(i).get("TODAYS_CHANGE"));
+            }
+            FileOutputStream outputStream = new FileOutputStream(System.getProperty("user.dir")+
+                    "\\src\\test\\resources\\OtherData\\StockName.xlsx");
+            workbook.write(outputStream);
+            workbook.close();
+            outputStream.close();
 
+        }catch (Exception e)
+        {
+            System.out.println("Exception Occurred while updating Stockname.xlsx workbook: "+e);
+        }
     }
+
 }

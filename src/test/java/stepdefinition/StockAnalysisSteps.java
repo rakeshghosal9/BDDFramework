@@ -22,6 +22,7 @@ public class StockAnalysisSteps {
     StockAnalysisPage st;
     List<String> allStocks = new ArrayList<String>();
     public static List<HashMap<String, String>> consolidatedData = new ArrayList<>();
+    public String sheetNameGlobal;
 
     @When("landed on the google homepage")
     public void landed_on_the_google_homepage() {
@@ -42,11 +43,13 @@ public class StockAnalysisSteps {
                 consolidatedData,
                 allStocks
         );
+        st.writeTodaysChangeInLastColumn(consolidatedData,allStocks,sheetNameGlobal);
     }
 
     @Given("we read all the company name from excel {string} and sheet name {string}")
     public void we_read_all_the_company_name_from_excel_and_sheet_name(String workbookName, String sheetName) {
 
+        sheetNameGlobal = sheetName;
         System.out.println("Reading the excel");
         XSSFWorkbook wb = ReusableUtilities.getWorkbookObject(System.getProperty("user.dir") + "\\src\\test\\resources\\OtherData\\" + workbookName + ".xlsx");
         System.out.println("Workbook : " + wb);
